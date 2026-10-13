@@ -1,0 +1,55 @@
+{
+  "orchestra": {
+    "title": "SPA String Orchestra",
+    "conductor": "Maestra Devereaux",
+    "rep": [
+      "Tchaikovsky — Serenade for Strings, i & iv",
+      "Jessie Montgomery — Starburst"
+    ],
+    "note": "Bowed parts are posted under Info → Links."
+  },
+  "quartets": [
+    {
+      "name": "Aurelia Quartet",
+      "coach": "Ms. Adeyemi",
+      "studio": "Studio A",
+      "coaching": "1:30 pm",
+      "rep": "Jessie Montgomery — Strum"
+    },
+    {
+      "name": "Paper Moon Quartet",
+      "coach": "Mr. Castillo",
+      "studio": "Studio B",
+      "coaching": "1:30 pm",
+      "rep": "Florence Price — Five Folksongs in Counterpoint, iii"
+    },
+    {
+      "name": "Voltage Quartet",
+      "coach": "Dr. Whitfield",
+      "studio": "Studio C",
+      "coaching": "1:30 pm",
+      "rep": "Beethoven — Quartet Op. 18 No. 4, iv"
+    },
+    {
+      "name": "North Star Quartet",
+      "coach": "Ms. Park",
+      "studio": "Studio D",
+      "coaching": "1:30 pm",
+      "rep": "Dvořák — \"American\" Quartet, i"
+    },
+    {
+      "name": "Firefly Quartet",
+      "coach": "Ms. Adeyemi",
+      "studio": "Studio A",
+      "coaching": "2:10 pm",
+      "rep": "Gabriela Lena Frank — Leyendas (selections)"
+    },
+    {
+      "name": "Latchkey Quartet",
+      "coach": "Mr. Castillo",
+      "studio": "Studio B",
+      "coaching": "2:10 pm",
+      "rep": "Haydn — Quartet Op. 20 No. 4, i"
+    }
+  ]
+}

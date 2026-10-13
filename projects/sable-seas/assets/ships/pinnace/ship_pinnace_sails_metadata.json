@@ -1,0 +1,200 @@
+{
+  "sails": [
+    {
+      "name": "ship_pinnace_sails_fore_top_furled",
+      "node": 7,
+      "triangles": 2424,
+      "original_min": [
+        -3.4281044006347656,
+        15.602797508239746,
+        9.528944969177246
+      ],
+      "original_max": [
+        3.496100664138794,
+        16.873693466186523,
+        9.91367244720459
+      ],
+      "original_topY": 16.873693466186523,
+      "pivot": [
+        0.0,
+        16.873693466186523,
+        9.600000381469727
+      ],
+      "mastPivotZ": 9.6,
+      "pivot_accuracy": "Estimated from rigging; source glTF supplies no armature",
+      "already_furled": true
+    },
+    {
+      "name": "ship_pinnace_sails_main_top_furled",
+      "node": 8,
+      "triangles": 2372,
+      "original_min": [
+        -2.730802536010742,
+        22.448259353637695,
+        -1.8162407875061035
+      ],
+      "original_max": [
+        2.7884573936462402,
+        24.07848358154297,
+        -1.3445018529891968
+      ],
+      "original_topY": 24.07848358154297,
+      "pivot": [
+        0.0,
+        24.07848358154297,
+        -1.600000023841858
+      ],
+      "mastPivotZ": -1.6,
+      "pivot_accuracy": "Estimated from rigging; source glTF supplies no armature",
+      "already_furled": true
+    },
+    {
+      "name": "ship_pinnace_sails_bowsprit_furled",
+      "node": 9,
+      "triangles": 1732,
+      "original_min": [
+        -3.47939395904541,
+        5.513841152191162,
+        18.171260833740234
+      ],
+      "original_max": [
+        3.5004706382751465,
+        6.38273811340332,
+        18.557498931884766
+      ],
+      "original_topY": 6.38273811340332,
+      "pivot": [
+        0.0,
+        6.38273811340332,
+        18.299999237060547
+      ],
+      "mastPivotZ": 18.3,
+      "pivot_accuracy": "Estimated from rigging; source glTF supplies no armature",
+      "already_furled": true
+    },
+    {
+      "name": "ship_pinnace_sails_fore_lower",
+      "node": 10,
+      "triangles": 1478,
+      "original_min": [
+        -4.0389838218688965,
+        7.453114032745361,
+        9.430254936218262
+      ],
+      "original_max": [
+        4.061238765716553,
+        10.830676078796387,
+        11.626335144042969
+      ],
+      "original_topY": 10.830676078796387,
+      "pivot": [
+        0.0,
+        10.830676078796387,
+        9.600000381469727
+      ],
+      "mastPivotZ": 9.6,
+      "pivot_accuracy": "Estimated from rigging; source glTF supplies no armature",
+      "already_furled": false
+    },
+    {
+      "name": "ship_pinnace_sails_main_large",
+      "node": 11,
+      "triangles": 1274,
+      "original_min": [
+        -4.3468122482299805,
+        11.759678840637207,
+        -1.3271418809890747
+      ],
+      "original_max": [
+        4.422078609466553,
+        18.255340576171875,
+        2.110712766647339
+      ],
+      "original_topY": 18.255340576171875,
+      "pivot": [
+        0.0,
+        18.255340576171875,
+        -1.600000023841858
+      ],
+      "mastPivotZ": -1.6,
+      "pivot_accuracy": "Estimated from rigging; source glTF supplies no armature",
+      "already_furled": false
+    },
+    {
+      "name": "ship_pinnace_sails_mizzen_middle",
+      "node": 12,
+      "triangles": 970,
+      "original_min": [
+        -3.6301615238189697,
+        12.885889053344727,
+        -11.300427436828613
+      ],
+      "original_max": [
+        3.6211776733398438,
+        17.841516494750977,
+        -9.231893539428711
+      ],
+      "original_topY": 17.841516494750977,
+      "pivot": [
+        0.0,
+        17.841516494750977,
+        -11.5
+      ],
+      "mastPivotZ": -11.5,
+      "pivot_accuracy": "Estimated from rigging; source glTF supplies no armature",
+      "already_furled": false
+    },
+    {
+      "name": "ship_pinnace_sails_mizzen_lower",
+      "node": 13,
+      "triangles": 908,
+      "original_min": [
+        -3.887366771697998,
+        8.932452201843262,
+        -11.361736297607422
+      ],
+      "original_max": [
+        3.8949475288391113,
+        12.135991096496582,
+        -9.530470848083496
+      ],
+      "original_topY": 12.135991096496582,
+      "pivot": [
+        0.0,
+        12.135991096496582,
+        -11.399999618530273
+      ],
+      "mastPivotZ": -11.4,
+      "pivot_accuracy": "Estimated from rigging; source glTF supplies no armature",
+      "already_furled": false
+    },
+    {
+      "name": "ship_pinnace_sails_mizzen_top",
+      "node": 14,
+      "triangles": 842,
+      "original_min": [
+        -3.0882339477539062,
+        17.988718032836914,
+        -11.469937324523926
+      ],
+      "original_max": [
+        3.096696376800537,
+        21.603199005126953,
+        -9.817635536193848
+      ],
+      "original_topY": 21.603199005126953,
+      "pivot": [
+        0.0,
+        21.603199005126953,
+        -11.600000381469727
+      ],
+      "mastPivotZ": -11.6,
+      "pivot_accuracy": "Estimated from rigging; source glTF supplies no armature",
+      "already_furled": false
+    }
+  ],
+  "axis": "Y up, original bow +Z",
+  "furl": "node.scale.y = amount; node.translation stays fixed",
+  "trim": "node.rotation.y = angle; node origin is mast pivot at original topY",
+  "note": "Three native sails were already furled. Newly separated meshes retain each original fold."
+}

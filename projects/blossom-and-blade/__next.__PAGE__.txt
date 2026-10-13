@@ -1,0 +1,11 @@
+1:"$Sreact.fragment"
+2:I[23271,["/projects/blossom-and-blade/_next/static/chunks/17hi~d2zf~ufw.js","/projects/blossom-and-blade/_next/static/chunks/03fef0ulhr1nm.js"],"default"]
+3:I[89803,["/projects/blossom-and-blade/_next/static/chunks/17hi~d2zf~ufw.js","/projects/blossom-and-blade/_next/static/chunks/03fef0ulhr1nm.js"],"default"]
+4:I[21915,["/projects/blossom-and-blade/_next/static/chunks/17hi~d2zf~ufw.js","/projects/blossom-and-blade/_next/static/chunks/03fef0ulhr1nm.js"],"default"]
+5:I[82756,["/projects/blossom-and-blade/_next/static/chunks/17hi~d2zf~ufw.js","/projects/blossom-and-blade/_next/static/chunks/03fef0ulhr1nm.js"],"default"]
+6:I[90872,["/projects/blossom-and-blade/_next/static/chunks/17hi~d2zf~ufw.js","/projects/blossom-and-blade/_next/static/chunks/03fef0ulhr1nm.js"],"default"]
+7:I[67673,["/projects/blossom-and-blade/_next/static/chunks/17hi~d2zf~ufw.js","/projects/blossom-and-blade/_next/static/chunks/03fef0ulhr1nm.js"],"default"]
+8:I[97367,["/projects/blossom-and-blade/_next/static/chunks/17hi~d2zf~ufw.js"],"OutletBoundary"]
+9:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","main",null,{"id":"beginning","children":[["$","$L2",null,{}],["$","$L3",null,{}],["$","$L4",null,{}],["$","$L5",null,{}],["$","$L6",null,{}],["$","$L7",null,{}]]}],[["$","script","script-0",{"src":"/projects/blossom-and-blade/_next/static/chunks/03fef0ulhr1nm.js","async":true}]],["$","$L8",null,{"children":["$","$9",null,{"name":"Next.MetadataOutlet","children":"$@a"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"EJUX-MX3xKiZ3-z9CUJVz"}
+a:null

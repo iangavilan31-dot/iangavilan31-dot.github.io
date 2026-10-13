@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life in Weeks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #060608;
+  --surface: #0d0d0f;
+  --border: #1c1c1f;
+  --text: #e2ddd6;
+  --muted: #3a3a40;
+  --dim: #1e1e22;
+  --gold: #c8a96e;
+  --gold-dim: #8a7248;
+  --blue: #4a5a80;
+  --blue-bright: #6a82b8;
+  --white: #f0ece6;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ---- SETUP SCREEN ---- */
+.setup {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.setup-eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+
+.setup-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.4rem, 7vw, 4.5rem);
+  color: var(--white);
+  text-align: center;
+  line-height: 1.1;
+  margin-bottom: 1.2rem;
+}
+
+.setup-title em {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.setup-sub {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 300;
+  text-align: center;
+  max-width: 380px;
+  line-height: 1.7;
+  margin-bottom: 3.5rem;
+}
+
+.setup-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.setup-form label {
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+input[type="date"] {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 300;
+  padding: 0.8rem 1.5rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  color-scheme: dark;
+  min-width: 200px;
+  text-align: center;
+}
+
+input[type="date"]:focus {
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 0 1px var(--gold-dim)22;
+}
+
+.btn-begin {
+  margin-top: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.85rem 3rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 2px;
+}
+
+.btn-begin:hover {
+  background: var(--gold);
+  color: var(--bg);
+}
+
+/* ---- MAIN APP ---- */
+.app {
+  display: none;
+  min-height: 100vh;
+  padding: 4rem 2rem 5rem;
+}
+
+.app.on { display: block; }
+
+.header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.header-eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--white);
+  line-height: 1.15;
+}
+
+.header h1 em { color: var(--gold); font-style: italic; }
+
+/* Stats */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 4rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.stat { text-align: center; }
+
+.stat-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  color: var(--gold);
+  display: block;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+
+.stat-lbl {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Progress */
+.progress-wrap {
+  max-width: 580px;
+  margin: 0 auto 3.5rem;
+}
+
+.progress-track {
+  height: 1px;
+  background: var(--dim);
+  position: relative;
+  overflow: visible;
+}
+
+.progress-fill {
+  height: 1px;
+  background: linear-gradient(90deg, #4a5a80, #c8a96e);
+  transition: width 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.progress-dot {
+  position: absolute;
+  right: -3px;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold)88;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.6rem;
+  font-size: 0.62rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+/* Grid layout */
+.grid-scroll {
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+
+.grid-outer {
+  display: inline-flex;
+  gap: 6px;
+  min-width: max-content;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.grid-left {
+  display: flex;
+  flex-direction: column;
+  padding-top: 14px;
+}
+
+.yr-lbl {
+  height: 8px;
+  margin-bottom: 2px;
+  font-size: 6.5px;
+  color: var(--dim);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 5px;
+  min-width: 22px;
+  letter-spacing: 0.04em;
+  user-select: none;
+}
+
+.yr-lbl.decade {
+  color: var(--muted);
+  font-size: 7px;
+}
+
+.grid-right { flex-shrink: 0; }
+
+.col-headers {
+  display: grid;
+  grid-template-columns: repeat(52, 8px);
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+.col-hdr {
+  width: 8px;
+  font-size: 5.5px;
+  color: transparent;
+  text-align: center;
+  user-select: none;
+}
+.col-hdr.mark { color: var(--dim); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(52, 8px);
+  grid-template-rows: repeat(90, 8px);
+  gap: 2px;
+}
+
+.w {
+  width: 8px;
+  height: 8px;
+  border-radius: 1.5px;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+  cursor: default;
+  will-change: transform;
+}
+
+.w.past {
+  background: var(--blue);
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.w.past:hover {
+  transform: scale(1.7);
+  opacity: 1;
+  z-index: 5;
+}
+
+.w.past.noted {
+  background: var(--gold);
+  opacity: 0.75;
+}
+
+.w.past.noted:hover { opacity: 1; }
+
+.w.now {
+  background: var(--white);
+  cursor: pointer;
+  animation: heartbeat 3s ease-in-out infinite;
+}
+
+.w.future {
+  background: var(--dim);
+  opacity: 0.6;
+}
+
+@keyframes heartbeat {
+  0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(240,236,230,0.5); }
+  40% { opacity: 0.8; box-shadow: 0 0 0 3px rgba(240,236,230,0.08); }
+  70% { opacity: 0.9; box-shadow: 0 0 0 5px rgba(240,236,230,0.03); }
+}
+
+/* Tooltip */
+.tip {
+  position: fixed;
+  background: #0e0e11;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 0.7rem 1rem;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.9);
+  max-width: 240px;
+}
+
+.tip.show { opacity: 1; }
+
+.tip-date {
+  font-size: 0.78rem;
+  color: var(--white);
+  margin-bottom: 0.2rem;
+  line-height: 1.4;
+}
+
+.tip-age {
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+.tip-note {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.72rem;
+  color: var(--gold);
+  font-style: italic;
+  margin-top: 0.4rem;
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Side panel */
+.panel-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0);
+  z-index: 500;
+  pointer-events: none;
+  transition: background 0.35s;
+}
+
+.panel-backdrop.open {
+  background: rgba(0,0,0,0.55);
+  pointer-events: all;
+}
+
+.panel {
+  position: fixed;
+  top: 0;
+  right: -480px;
+  width: min(480px, 100vw);
+  height: 100vh;
+  background: #0b0b0e;
+  border-left: 1px solid var(--border);
+  z-index: 600;
+  transition: right 0.38s cubic-bezier(0.4,0,0.2,1);
+  display: flex;
+  flex-direction: column;
+  padding: 2.5rem 2rem 2rem;
+  gap: 0;
+  overflow-y: auto;
+}
+
+.panel.open { right: 0; }
+
+.panel-x {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  cursor: pointer;
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  transition: color 0.2s, background 0.2s;
+}
+.panel-x:hover { color: var(--text); background: var(--dim); }
+
+.panel-week-num {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.7rem;
+}
+
+.panel-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  color: var(--white);
+  line-height: 1.4;
+  margin-bottom: 0.4rem;
+}
+
+.panel-age-str {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.88rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-bottom: 2rem;
+}
+
+.panel-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
+
+.panel-textarea {
+  flex: 1;
+  min-height: 220px;
+  background: var(--dim);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: #ccc8c0;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  padding: 1.1rem 1.2rem;
+  resize: none;
+  outline: none;
+  transition: border-color 0.25s;
+  margin-bottom: 1rem;
+}
+
+.panel-textarea:focus { border-color: #2e2e34; }
+
+.panel-textarea::placeholder {
+  color: #2a2a30;
+  font-style: italic;
+}
+
+.panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.save-status {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #4a7a55;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.save-status.show { opacity: 1; }
+
+.btn-save {
+  background: transparent;
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.7rem 1.8rem;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.25s;
+}
+
+.btn-save:hover { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+
+/* Legend */
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+.leg-dot {
+  width: 8px; height: 8px;
+  border-radius: 1.5px;
+  flex-shrink: 0;
+}
+
+.footer-reset {
+  display: block;
+  margin: 2.5rem auto 0;
+  background: transparent;
+  border: none;
+  color: var(--dim);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.3s;
+  padding: 0.5rem 1rem;
+}
+
+.footer-reset:hover { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ---- SETUP ---- -->
+<div class="setup" id="setup">
+  <div class="setup-eyebrow">A meditation on time</div>
+  <h1 class="setup-title">Your Life<br><em>in Weeks</em></h1>
+  <p class="setup-sub">Every square below is one week of a 90-year life. The ones behind you are filled. The rest wait in silence. Click any past week to leave a memory.</p>
+  <div class="setup-form">
+    <label for="dob">Your date of birth</label>
+    <input type="date" id="dob" max="">
+    <button class="btn-begin" id="beginBtn">Begin</button>
+  </div>
+</div>
+
+<!-- ---- MAIN APP ---- -->
+<div class="app" id="app">
+  <div class="header">
+    <div class="header-eyebrow">A single square for every week of your life</div>
+    <h1>Your Life <em>in Weeks</em></h1>
+  </div>
+
+  <div class="stats" id="statsBar"></div>
+
+  <div class="progress-wrap">
+    <div class="progress-track">
+      <div class="progress-fill" id="progFill" style="width:0%">
+        <div class="progress-dot"></div>
+      </div>
+    </div>
+    <div class="progress-labels">
+      <span>Birth</span>
+      <span id="progPct">0%</span>
+      <span>90 years</span>
+    </div>
+  </div>
+
+  <div class="grid-scroll">
+    <div class="grid-outer">
+      <div class="grid-left" id="yrLabels"></div>
+      <div class="grid-right">
+        <div class="col-headers" id="colHdrs"></div>
+        <div class="grid" id="grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#4a5a80;opacity:.55"></div>Past week</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#c8a96e;opacity:.75"></div>Week with memory</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#f0ece6"></div>This week</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#1e1e22;opacity:.6"></div>Future</div>
+  </div>
+
+  <button class="footer-reset" id="resetBtn">Reset birthdate</button>
+</div>
+
+<!-- ---- TOOLTIP ---- -->
+<div class="tip" id="tip">
+  <div class="tip-date" id="tipDate"></div>
+  <div class="tip-age" id="tipAge"></div>
+  <div class="tip-note" id="tipNote"></div>
+</div>
+
+<!-- ---- PANEL ---- -->
+<div class="panel-backdrop" id="backdrop"></div>
+<div class="panel" id="panel">
+  <button class="panel-x" id="panelX">✕</button>
+  <div class="panel-week-num" id="panelNum"></div>
+  <div class="panel-title" id="panelTitle"></div>
+  <div class="panel-age-str" id="panelAgeStr"></div>
+  <div class="panel-label">Memory from this week</div>
+  <textarea class="panel-textarea" id="panelTA"
+    placeholder="Where were you? Who were you with?&#10;&#10;What were you chasing, building, feeling?&#10;What did you not yet know?"></textarea>
+  <div class="panel-footer">
+    <span class="save-status" id="saveStatus">Saved</span>
+    <button class="btn-save" id="saveBtn">Save memory</button>
+  </div>
+</div>
+
+<script>
+const YEARS = 90, WPY = 52, TOTAL = YEARS * WPY;
+const MS_WEEK = 7 * 24 * 60 * 60 * 1000;
+
+let birth = null, activeKey = null;
+
+// Elements
+const setup = document.getElementById('setup');
+const app = document.getElementById('app');
+const dob = document.getElementById('dob');
+const beginBtn = document.getElementById('beginBtn');
+const grid = document.getElementById('grid');
+const yrLabels = document.getElementById('yrLabels');
+const colHdrs = document.getElementById('colHdrs');
+const tip = document.getElementById('tip');
+const tipDate = document.getElementById('tipDate');
+const tipAge = document.getElementById('tipAge');
+const tipNote = document.getElementById('tipNote');
+const backdrop = document.getElementById('backdrop');
+const panel = document.getElementById('panel');
+const panelX = document.getElementById('panelX');
+const panelNum = document.getElementById('panelNum');
+const panelTitle = document.getElementById('panelTitle');
+const panelAgeStr = document.getElementById('panelAgeStr');
+const panelTA = document.getElementById('panelTA');
+const saveBtn = document.getElementById('saveBtn');
+const saveStatus = document.getElementById('saveStatus');
+const resetBtn = document.getElementById('resetBtn');
+const progFill = document.getElementById('progFill');
+const progPct = document.getElementById('progPct');
+
+dob.max = new Date().toISOString().slice(0, 10);
+
+// Load saved birth
+const stored = localStorage.getItem('liw_birth');
+if (stored) { birth = new Date(stored + 'T00:00:00'); launch(); }
+
+beginBtn.addEventListener('click', () => {
+  if (!dob.value) { dob.focus(); return; }
+  birth = new Date(dob.value + 'T00:00:00');
+  localStorage.setItem('liw_birth', dob.value);
+  launch();
+});
+dob.addEventListener('keydown', e => e.key === 'Enter' && beginBtn.click());
+
+resetBtn.addEventListener('click', () => {
+  if (!confirm('Reset birthdate? Your week memories are kept.')) return;
+  localStorage.removeItem('liw_birth');
+  setup.style.display = 'flex';
+  app.classList.remove('on');
+  dob.value = '';
+});
+
+function noteKey(y, w) { return `liw_${y}_${w}`; }
+function getNote(y, w) { return localStorage.getItem(noteKey(y, w)) || ''; }
+
+function fmtDate(d) {
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function weekStart(idx) {
+  return new Date(birth.getTime() + idx * MS_WEEK);
+}
+
+function launch() {
+  setup.style.display = 'none';
+  app.classList.add('on');
+  renderAll();
+}
+
+function renderAll() {
+  const now = new Date();
+  const msLived = now - birth;
+  const wLived = Math.floor(msLived / MS_WEEK);
+  const yLived = msLived / (365.25 * 24 * 60 * 60 * 1000);
+  const pct = Math.min(wLived / TOTAL * 100, 100);
+
+  // Stats
+  const wLeft = Math.max(0, TOTAL - wLived);
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat"><span class="stat-val">${wLived.toLocaleString()}</span><span class="stat-lbl">Weeks lived</span></div>
+    <div class="stat"><span class="stat-val">${Math.floor(yLived)}</span><span class="stat-lbl">Years old</span></div>
+    <div class="stat"><span class="stat-val">${wLeft.toLocaleString()}</span><span class="stat-lbl">Weeks ahead</span></div>
+    <div class="stat"><span class="stat-val">${pct.toFixed(1)}%</span><span class="stat-lbl">Of 90 years</span></div>
+  `;
+
+  setTimeout(() => {
+    progFill.style.width = pct + '%';
+    progPct.textContent = pct.toFixed(1) + '%';
+  }, 120);
+
+  // Column headers (week numbers, mark quarters)
+  colHdrs.innerHTML = '';
+  for (let w = 0; w < WPY; w++) {
+    const d = document.createElement('div');
+    d.className = 'col-hdr';
+    const marks = [1, 13, 26, 39, 52];
+    const markW = [0, 12, 25, 38, 51];
+    const mi = markW.indexOf(w);
+    if (mi >= 0) { d.textContent = marks[mi]; d.classList.add('mark'); }
+    colHdrs.appendChild(d);
+  }
+
+  // Year labels
+  yrLabels.innerHTML = '';
+  for (let y = 0; y < YEARS; y++) {
+    const d = document.createElement('div');
+    d.className = 'yr-lbl' + (y % 10 === 0 ? ' decade' : '');
+    if (y % 5 === 0) d.textContent = y;
+    yrLabels.appendChild(d);
+  }
+
+  // Cells
+  grid.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  for (let y = 0; y < YEARS; y++) {
+    for (let w = 0; w < WPY; w++) {
+      const idx = y * WPY + w;
+      const cell = document.createElement('div');
+      cell.className = 'w';
+      cell.dataset.y = y;
+      cell.dataset.w = w;
+      cell.dataset.i = idx;
+      if (idx < wLived) {
+        cell.classList.add('past');
+        if (getNote(y, w)) cell.classList.add('noted');
+      } else if (idx === wLived) {
+        cell.classList.add('now');
+      } else {
+        cell.classList.add('future');
+      }
+      frag.appendChild(cell);
+    }
+  }
+  grid.appendChild(frag);
+
+  // Events via delegation
+  grid.addEventListener('mousemove', onMove);
+  grid.addEventListener('mouseleave', () => tip.classList.remove('show'));
+  grid.addEventListener('click', onClick);
+}
+
+function onMove(e) {
+  const cell = e.target.closest('.w');
+  if (!cell || cell.classList.contains('future')) { tip.classList.remove('show'); return; }
+
+  const y = +cell.dataset.y, w = +cell.dataset.w, idx = +cell.dataset.i;
+  const s = weekStart(idx);
+  const end = new Date(s.getTime() + 6 * 24 * 60 * 60 * 1000);
+
+  tipDate.textContent = fmtDate(s) + ' – ' + fmtDate(end);
+  tipAge.textContent = cell.classList.contains('now')
+    ? 'This very week'
+    : `Age ${y}, week ${w + 1} of the year`;
+
+  const note = getNote(y, w);
+  tipNote.textContent = note.slice(0, 100) + (note.length > 100 ? '…' : '');
+  tipNote.style.display = note ? 'block' : 'none';
+
+  const tx = Math.min(e.clientX + 14, window.innerWidth - 260);
+  const ty = Math.min(e.clientY + 12, window.innerHeight - 140);
+  tip.style.left = tx + 'px';
+  tip.style.top = ty + 'px';
+  tip.classList.add('show');
+}
+
+function onClick(e) {
+  const cell = e.target.closest('.w');
+  if (!cell || cell.classList.contains('future')) return;
+  openPanel(+cell.dataset.y, +cell.dataset.w, +cell.dataset.i);
+}
+
+function openPanel(y, w, idx) {
+  activeKey = noteKey(y, w);
+
+  const s = weekStart(idx);
+  const end = new Date(s.getTime() + 6 * 24 * 60 * 60 * 1000);
+
+  panelNum.textContent = `Year ${y} · Week ${w + 1}`;
+  panelTitle.innerHTML = `${fmtDate(s)}<br><span style="opacity:.35;font-size:.85em">through ${fmtDate(end)}</span>`;
+
+  // Exact age
+  const days = Math.floor((s - birth) / (24 * 60 * 60 * 1000));
+  const ageY = Math.floor(days / 365.25);
+  const ageM = Math.floor((days % 365.25) / 30.44);
+  panelAgeStr.textContent = `You were ${ageY} years, ${ageM} months old`;
+
+  panelTA.value = localStorage.getItem(activeKey) || '';
+  saveStatus.classList.remove('show');
+
+  panel.classList.add('open');
+  backdrop.classList.add('open');
+  setTimeout(() => panelTA.focus(), 380);
+}
+
+function closePanel() {
+  panel.classList.remove('open');
+  backdrop.classList.remove('open');
+  activeKey = null;
+}
+
+panelX.addEventListener('click', closePanel);
+backdrop.addEventListener('click', closePanel);
+document.addEventListener('keydown', e => e.key === 'Escape' && closePanel());
+
+saveBtn.addEventListener('click', () => {
+  if (!activeKey) return;
+  const val = panelTA.value.trim();
+  if (val) localStorage.setItem(activeKey, val);
+  else localStorage.removeItem(activeKey);
+
+  // Update cell
+  const [, yy, ww] = activeKey.split('_');
+  const cells = grid.querySelectorAll(`.w[data-y="${yy}"][data-w="${ww}"]`);
+  cells.forEach(c => val ? c.classList.add('noted') : c.classList.remove('noted'));
+
+  saveStatus.classList.add('show');
+  setTimeout(() => saveStatus.classList.remove('show'), 2200);
+});
+
+// Auto-save
+let autoSave;
+panelTA.addEventListener('input', () => {
+  clearTimeout(autoSave);
+  autoSave = setTimeout(() => saveBtn.click(), 1200);
+});
+</script>
+</body>
+</html>

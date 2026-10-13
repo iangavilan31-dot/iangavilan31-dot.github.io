@@ -1,0 +1,121 @@
+{
+  "project": "Blossom & Blade",
+  "subtitle": "A quiet war beneath the blossoms.",
+  "scenes": [
+    {
+      "id": "01",
+      "slug": "crimson-silence",
+      "file": "scene-01-crimson-silence",
+      "title": "CRIMSON SILENCE",
+      "subtitle": "The Last Vigil",
+      "caption": "A warrior waits where the sun refuses to die.",
+      "caption_alt": "Some wars are not fought with swords.",
+      "section": "war",
+      "palette": {
+        "primary": "#C4501A",
+        "secondary": "#1A0A05",
+        "accent": "#F5E8D0",
+        "fog": "rgba(196,80,26,0.15)"
+      },
+      "aspect": "portrait",
+      "animation_type": "fog_sparks",
+      "audio_cue": "distant_wind",
+      "loop_file": "scene-01-crimson-silence.mp4",
+      "poster_file": "scene-01-crimson-silence.png"
+    },
+    {
+      "id": "02",
+      "slug": "rain-walker",
+      "file": "scene-02-rain-walker",
+      "title": "THE WANDERER",
+      "subtitle": "Through Every Storm",
+      "caption": "He walks through storms that others call home.",
+      "caption_alt": "The sword rusts. The silence remains.",
+      "section": "rain",
+      "palette": {
+        "primary": "#2A2A2A",
+        "secondary": "#F0EDE8",
+        "accent": "#8A8A8A",
+        "fog": "rgba(240,237,232,0.15)"
+      },
+      "aspect": "portrait",
+      "animation_type": "rain_mist",
+      "audio_cue": "heavy_rain",
+      "loop_file": "scene-02-rain-walker.mp4",
+      "poster_file": "scene-02-rain-walker.png"
+    },
+    {
+      "id": "03",
+      "slug": "pagoda-dream",
+      "file": "scene-03-pagoda-dream",
+      "title": "THE DREAMING PAGODA",
+      "subtitle": "Between Heaven and Earth",
+      "caption": "Between mountain and cloud, the temple waits.",
+      "caption_alt": "Some places are not found. They are remembered.",
+      "section": "spring",
+      "palette": {
+        "primary": "#6BA5A0",
+        "secondary": "#F5D0D5",
+        "accent": "#FFFFFF",
+        "fog": "rgba(245,208,213,0.25)"
+      },
+      "aspect": "portrait",
+      "animation_type": "petals_fog",
+      "audio_cue": "soft_wind",
+      "loop_file": "scene-03-pagoda-dream.mp4",
+      "poster_file": "scene-03-pagoda-dream.png"
+    },
+    {
+      "id": "04",
+      "slug": "last-petal",
+      "file": "scene-04-last-petal",
+      "title": "SAKURA MONO",
+      "subtitle": "The Language of Flowers",
+      "caption": "Even in bloom, the branch remembers winter.",
+      "caption_alt": "Beauty is what remains after the storm passes.",
+      "section": "spring",
+      "palette": {
+        "primary": "#E8C0C0",
+        "secondary": "#F5EDED",
+        "accent": "#8B3A3A",
+        "fog": "rgba(232,192,192,0.2)"
+      },
+      "aspect": "landscape",
+      "animation_type": "petals_drift",
+      "audio_cue": "shakuhachi",
+      "loop_file": "scene-04-last-petal.mp4",
+      "poster_file": "scene-04-last-petal.png"
+    },
+    {
+      "id": "05",
+      "slug": "blossom-shadow",
+      "file": "scene-05-blossom-shadow",
+      "title": "BLOSSOM SHADOW",
+      "subtitle": "What the Petals Know",
+      "caption": "He stands beneath beauty, thinking of war.",
+      "caption_alt": "Only the story remains.",
+      "section": "spring",
+      "palette": {
+        "primary": "#C9A0A0",
+        "secondary": "#F0E8E0",
+        "accent": "#1A1010",
+        "fog": "rgba(232,192,192,0.15)"
+      },
+      "aspect": "portrait",
+      "animation_type": "petals_swirl",
+      "audio_cue": "koto_ambient",
+      "loop_file": "scene-05-blossom-shadow.mp4",
+      "poster_file": "scene-05-blossom-shadow.png"
+    }
+  ],
+  "audio": {
+    "tracks": [
+      { "id": "intro",    "file": "intro-thunder.mp3",      "loop": false, "volume": 0.4 },
+      { "id": "spring",   "file": "spring-shakuhachi.mp3",  "loop": true,  "volume": 0.25 },
+      { "id": "war",      "file": "war-taiko.mp3",          "loop": true,  "volume": 0.3 },
+      { "id": "rain",     "file": "rain-ambient.mp3",       "loop": true,  "volume": 0.35 },
+      { "id": "gallery",  "file": "koto-ambient.mp3",       "loop": true,  "volume": 0.2 },
+      { "id": "ending",   "file": "ending-silence.mp3",     "loop": false, "volume": 0.15 }
+    ]
+  }
+}

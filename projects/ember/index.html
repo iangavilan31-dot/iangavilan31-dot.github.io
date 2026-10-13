@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>EMBER</title>
+    <meta name="theme-color" content="#080503" />
+    <style>
+      /* Full bleed. There is no page here, only the piece: no header, no nav,
+         no scroll. The only text that ever appears is the title of the section
+         currently playing, and it leaves again. */
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; padding: 0; height: 100%;
+        background: #080503; color: #f6e6d2; overflow: hidden;
+        font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      canvas { display: block; width: 100vw; height: 100vh; }
+
+      /* --- the gate: audio needs a gesture, so make the gesture the piece --- */
+      #gate {
+        position: fixed; inset: 0; z-index: 20;
+        display: grid; place-content: center; gap: 1.6rem; text-align: center;
+        background: radial-gradient(120% 90% at 50% 78%, #2a0f05 0%, #120805 45%, #080503 100%);
+        cursor: pointer; transition: opacity 900ms cubic-bezier(.22,.61,.36,1);
+        border: 0; color: inherit; font: inherit; width: 100%;
+      }
+      #gate[hidden] { display: none; }
+      #gate.out { opacity: 0; pointer-events: none; }
+      .title {
+        font-size: clamp(4rem, 19vw, 15rem); line-height: .82; margin: 0;
+        letter-spacing: .06em; font-weight: 400;
+        background: linear-gradient(178deg, #fff3e2 8%, #ffa32c 46%, #a8300b 92%);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+        filter: drop-shadow(0 0 46px rgba(255,124,32,.36));
+      }
+      .sub {
+        font-size: clamp(.72rem, 1.5vw, .92rem); letter-spacing: .42em;
+        text-transform: uppercase; color: #b4805c; margin: 0;
+        font-family: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+      }
+      .go {
+        font-size: clamp(.66rem, 1.3vw, .78rem); letter-spacing: .34em;
+        text-transform: uppercase; color: #6f4a34; margin: 0;
+        font-family: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+      }
+      @keyframes pulse { 0%,100% { opacity:.42 } 50% { opacity:1 } }
+      .go { animation: pulse 2.6s ease-in-out infinite; }
+
+      /* --- section titles: the only text during playback ----------------- */
+      #chapter {
+        position: fixed; left: 0; right: 0; bottom: 12vh; z-index: 10;
+        text-align: center; pointer-events: none;
+        font-size: clamp(1.5rem, 5.2vw, 4rem); letter-spacing: .3em;
+        color: #ffd7a8; opacity: 0; text-transform: uppercase;
+        text-shadow: 0 0 34px rgba(255,140,44,.5);
+      }
+
+      /* --- a hairline of progress, and nothing else ---------------------- */
+      #bar {
+        position: fixed; left: 0; bottom: 0; height: 2px; width: 0;
+        background: linear-gradient(90deg, #7a2409, #ff9a2e); z-index: 12;
+        pointer-events: none;
+      }
+      #hint {
+        position: fixed; right: 1.1rem; bottom: 1.1rem; z-index: 12;
+        font-family: ui-monospace, monospace; font-size: .6rem;
+        letter-spacing: .22em; text-transform: uppercase; color: #5a3a28;
+        opacity: 0; transition: opacity 400ms; pointer-events: none;
+      }
+      body:hover #hint { opacity: 1; }
+
+      #fallback {
+        position: fixed; inset: 0; z-index: 30; display: none;
+        place-content: center; text-align: center; padding: 2rem;
+        background: #0d0705; color: #d8bfa6; line-height: 1.7;
+      }
+      #fallback p { max-width: 34rem; margin: .6rem auto; }
+
+      @media (prefers-reduced-motion: reduce) {
+        .go { animation: none; opacity: .8; }
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/index-DjHQN9lH.js"></script>
+  </head>
+  <body>
+    <canvas id="stage" aria-hidden="true"></canvas>
+
+    <div id="chapter" role="status" aria-live="polite"></div>
+    <div id="bar"></div>
+    <p id="hint">space · pause &nbsp; r · restart</p>
+
+    <button id="gate" type="button">
+      <h1 class="title">EMBER</h1>
+      <p class="sub">a slow blues in G minor &nbsp;·&nbsp; viola and ensemble &nbsp;·&nbsp; 3:03</p>
+      <p class="go">press to play</p>
+    </button>
+
+    <div id="fallback">
+      <p><strong>EMBER needs a browser that can play audio and draw to a canvas.</strong></p>
+      <p id="fallback-why"></p>
+    </div>
+
+    <audio id="audio" preload="auto"></audio>
+  </body>
+</html>

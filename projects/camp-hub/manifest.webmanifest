@@ -1,0 +1,12 @@
+{
+  "name": "SPA Hub — Sphinx Performance Academy",
+  "short_name": "SPA Hub",
+  "description": "Everything for the Sphinx Performance Academy cohort in one link.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#faf9f6",
+  "theme_color": "#1e50a2",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

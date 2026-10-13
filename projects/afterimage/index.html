@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en" data-room="archive">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>AFTERIMAGE — Ian Gavilan</title>
+    <meta
+      name="description"
+      content="AFTERIMAGE — a personal digital museum by Ian Gavilan. Three rooms: Archive, Signal, Knight."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <!-- Ground colour is painted before React mounts so there is no white flash. -->
+    <style>
+      html { background: #f2ede3; }
+      html[data-room='signal'] { background: #0b0b0a; }
+      html[data-room='knight'] { background: #0d0d0c; }
+    </style>
+    <script>
+      // Stamp the room from the URL before first paint. React sets this too,
+      // but its effect runs after the first frame, which made a direct link to
+      // a dark room paint on paper and then fade - the flash of an unstyled
+      // room the brief rules out. Setting it here means React's later write is
+      // the same value, so no transition ever runs on load.
+      (function () {
+        var rooms = ['archive', 'signal', 'knight', 'index'];
+        // Retired URLs resolve to where the router will actually send them, so
+        // the pre-paint ground matches the room that ends up rendering.
+        var legacy = { print: 'archive', shore: 'index' };
+        var segs = (location.hash.slice(1) || location.pathname).split('/').filter(Boolean);
+        var last = segs.length ? segs[segs.length - 1] : '';
+        var room = rooms.indexOf(last) !== -1 ? last : (legacy[last] || 'archive');
+        document.documentElement.setAttribute('data-room', room);
+      })();
+    </script>
+    <script type="module" crossorigin src="./assets/index-C2ivgf9s.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DxPtg7u4.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <p style="font-family: sans-serif; padding: 2rem">
+        AFTERIMAGE renders its artwork in the browser and needs JavaScript enabled.
+      </p>
+    </noscript>
+  </body>
+</html>

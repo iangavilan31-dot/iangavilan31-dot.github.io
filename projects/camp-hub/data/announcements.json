@@ -1,0 +1,90 @@
+[
+  {
+    "id": "a1",
+    "day": "2026-07-17",
+    "time": "7:32 AM",
+    "author": "Program Office",
+    "pinned": true,
+    "tag": "today's plan",
+    "title": "Your day at a glance",
+    "items": [
+      "Breakfast is in the dorm lounge this morning; lunch and dinner are at the normal times.",
+      "9:00 rehearsal, 4:30 masterclass — full schedule is on the Schedule tab.",
+      "Tomorrow's final concert: your dress-rehearsal time is posted under Schedule → Saturday."
+    ]
+  },
+  {
+    "id": "a6",
+    "day": "2026-07-17",
+    "time": "2:19 PM",
+    "author": "Program Office",
+    "pinned": true,
+    "tag": "important",
+    "title": "Final concert — what to do tomorrow",
+    "body": "Arrive at your dress-rehearsal time (Schedule → Saturday). Sign in at the desk outside the hall before you go backstage. Only performers in the hall; a CA will tell you when to enter."
+  },
+  {
+    "id": "a2",
+    "day": "2026-07-17",
+    "time": "7:35 AM",
+    "author": "Program Office",
+    "tag": "weather",
+    "body": "It's raining today — bring a cover for your instrument on the walk to the hall."
+  },
+  {
+    "id": "a4",
+    "day": "2026-07-17",
+    "time": "9:30 AM",
+    "author": "Residence Life",
+    "tag": "practice rooms",
+    "body": "Practice rooms are first-come, first-serve. Once you're in one, stay put, and follow the 50/10 rule — 50 minutes on, 10 minutes off."
+  },
+  {
+    "id": "a3",
+    "day": "2026-07-17",
+    "time": "9:19 AM",
+    "author": "Residence Life",
+    "tag": "tonight",
+    "body": "Lights-out is 10:00 tonight if this morning's rehearsal goes well, 9:30 if we need the extra rest before the concert."
+  },
+  {
+    "id": "a5",
+    "day": "2026-07-17",
+    "time": "11:46 AM",
+    "author": "CA Team",
+    "tag": "right now",
+    "body": "Head to the cafeteria for lunch — a CA is there waiting for you."
+  },
+  {
+    "id": "a7",
+    "day": "2026-07-17",
+    "time": "8:49 PM",
+    "author": "CA Team",
+    "tag": "check-in",
+    "body": "Have your phone on you for the 9:00 pm check-in tonight."
+  },
+  {
+    "id": "a8",
+    "day": "2026-07-16",
+    "time": "9:11 AM",
+    "author": "Program Office",
+    "tag": "travel",
+    "body": "Flying home Sunday? Check in for your flight as soon as it opens, then add your details under Sign-ups → Airport shuttle. A CA can help if you're stuck."
+  },
+  {
+    "id": "a9",
+    "day": "2026-07-16",
+    "time": "12:59 PM",
+    "author": "Chamber Coordinator",
+    "tag": "lost & found",
+    "body": "One quartet is missing its second-violin part (blue folder). Please check your bag and drop it at the front desk if you find it."
+  },
+  {
+    "id": "a11",
+    "day": "2026-07-16",
+    "time": "5:31 PM",
+    "author": "Dining",
+    "tag": "meal cards",
+    "body": "Turn in your meal card at the front desk before you leave at the end of the week."
+  }
+]

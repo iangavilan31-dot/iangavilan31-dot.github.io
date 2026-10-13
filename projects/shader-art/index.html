@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Void</title>
+<style>
+* { margin:0; padding:0; }
+body { background:#000; overflow:hidden; }
+canvas { display:block; width:100vw; height:100vh; cursor:none; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+if (!gl) { document.body.innerHTML='<p style="color:#fff;padding:2rem">WebGL required</p>'; throw 0; }
+
+// ─── VERTEX ─────────────────────────────────────────────────────────────────
+const VERT = `
+attribute vec2 a;
+void main(){ gl_Position = vec4(a,0,1); }
+`;
+
+// ─── FRAGMENT ────────────────────────────────────────────────────────────────
+const FRAG = `
+precision highp float;
+uniform vec2  u_res;
+uniform float u_time;
+uniform vec2  u_mouse;   // screen pixels
+uniform vec2  u_vel;     // mouse velocity (pixels/frame, smoothed)
+
+// ─ Hash & noise ─────────────────────────────────────────
+float h(vec2 p){
+  p = fract(p*vec2(127.1,311.7));
+  return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);
+}
+float n(vec2 p){
+  vec2 i=floor(p), f=fract(p);
+  f=f*f*(3.-2.*f);
+  return mix(mix(h(i),h(i+vec2(1,0)),f.x),
+             mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);
+}
+float fbm(vec2 p){
+  float v=0.,a=.5;
+  for(int i=0;i<6;i++){ v+=a*n(p); p=p*2.+7.3; a*=.5; }
+  return v;
+}
+
+// ─ Palette: vivid electric colors cycling over time ──────
+vec3 palette(float t){
+  // 3 beautiful palettes blended by time
+  vec3 a = vec3(0.5);
+  vec3 b = vec3(0.5);
+  vec3 c = vec3(1.0, 1.0, 0.5);
+  vec3 d = vec3(0.80, 0.90, 0.30);
+  // Shift hue offset slowly
+  float hShift = u_time * 0.04;
+  d = vec3(0.00+hShift, 0.33+hShift, 0.67+hShift);
+  return a + b*cos(6.28318*(c*t+d));
+}
+
+void main(){
+  // Normalised coords, y up, aspect corrected
+  vec2 uv = (gl_FragCoord.xy - 0.5*u_res) / u_res.y;
+
+  // Mouse in same space
+  vec2 mouse = (u_mouse - 0.5*u_res) / u_res.y;
+
+  // ── Gravity warp ─────────────────────────────────────────
+  // Pull uv toward cursor like a gravity well
+  vec2 toM  = mouse - uv;
+  float dist = length(toM);
+
+  // Gravity strength: strong close, zero far
+  float grav = 0.12 / (dist * dist + 0.015);
+  grav = min(grav, 2.5); // cap so it doesn't explode at cursor
+
+  // Warp uv toward mouse
+  vec2 warpedUV = uv + toM * grav * 0.8;
+
+  // ── Velocity smear ───────────────────────────────────────
+  // When mouse moves fast, smear the warp in the direction of travel
+  vec2 velDir  = normalize(u_vel + vec2(0.00001));
+  float velMag = length(u_vel) * 0.0012;
+  float smear  = max(0., dot(normalize(toM + vec2(0.00001)), -velDir));
+  warpedUV += velDir * smear * velMag * exp(-dist * 3.0);
+
+  // ── Plasma / fractal field ───────────────────────────────
+  // Sum of trig waves at different frequencies/phases
+  // All using WARPED UV so the cursor bends the field
+  vec2 p = warpedUV * 2.5;
+  float t = u_time;
+
+  float field = 0.0;
+  field += sin(p.x * 2.1 + t * 1.8 + sin(p.y * 1.4 + t));
+  field += sin(p.y * 1.7 - t * 2.2 + sin(p.x * 2.0 - t * 0.7));
+  field += sin((p.x + p.y) * 1.5 + t * 1.3);
+  field += sin(length(p) * 3.0 - t * 2.8);
+  field += sin(p.x * 3.3 - p.y * 1.8 + t * 0.9);
+  field = (field / 5.0 + 1.0) * 0.5; // normalize [0,1]
+
+  // Layer in FBM for organic texture
+  float organic = fbm(warpedUV * 3.0 + t * 0.15);
+  field = mix(field, field * organic * 1.8, 0.35);
+
+  // ── Color ────────────────────────────────────────────────
+  vec3 col = palette(field + organic * 0.3);
+
+  // Multiply by field intensity — keeps darks dark
+  col *= 0.3 + 0.7 * pow(field, 0.8);
+
+  // ── Cursor glow ──────────────────────────────────────────
+  // Bright corona around the cursor
+  float corona = 0.006 / (dist + 0.003);
+  corona += 0.002 / (dist * dist + 0.001);
+  col += vec3(1.0, 0.85, 0.6) * corona;
+
+  // Pulse ring expanding from cursor
+  float ring = abs(dist - mod(t * 0.5, 0.8));
+  float ringGlow = exp(-ring * ring * 800.0) * 0.5 * exp(-dist * 2.5);
+  col += vec3(0.6, 0.8, 1.0) * ringGlow;
+
+  // ── Star field (unwarped — they're infinitely far) ───────
+  // Use original uv for stars so they don't warp
+  vec2 starUV = uv * 180.0;
+  vec2 sCell  = floor(starUV);
+  vec2 sGV    = fract(starUV) - 0.5;
+  float sH    = h(sCell);
+  if(sH > 0.92){
+    vec2 sp = (vec2(h(sCell+0.1), h(sCell+0.2)) - 0.5) * 0.7;
+    float sd = length(sGV - sp);
+    float twinkle = 0.8 + 0.2*sin(t*(2.+3.*h(sCell)) + h(sCell)*6.28);
+    float star = smoothstep(0.06, 0.0, sd) * twinkle;
+    col += star * vec3(0.9, 0.95, 1.0) * 1.2;
+  }
+
+  // ── Vortex near cursor ────────────────────────────────────
+  // Spinning swirl arms that rotate around the cursor
+  float angle = atan(toM.y, toM.x);
+  float swirl = sin(angle * 3.0 + t * 2.5 - dist * 8.0);
+  float swirlMask = exp(-dist * dist * 25.0);
+  col += palette(field + 0.5) * swirl * swirlMask * 0.4;
+
+  // ── Tone map + vignette ───────────────────────────────────
+  col = col / (col + 0.8); // filmic
+  col = pow(clamp(col, 0., 1.), vec3(0.85));
+
+  // Soft vignette
+  float vig = 1.0 - dot(uv * 0.7, uv * 0.7);
+  col *= clamp(vig, 0., 1.);
+
+  gl_FragColor = vec4(col, 1.0);
+}
+`;
+
+// ─── COMPILE ─────────────────────────────────────────────────────────────────
+function mkShader(type, src) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src);
+  gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(s);
+  return s;
+}
+const prog = gl.createProgram();
+gl.attachShader(prog, mkShader(gl.VERTEX_SHADER,   VERT));
+gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER, FRAG));
+gl.linkProgram(prog);
+if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw gl.getProgramInfoLog(prog);
+gl.useProgram(prog);
+
+// Full-screen quad
+const buf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+const aLoc = gl.getAttribLocation(prog, 'a');
+gl.enableVertexAttribArray(aLoc);
+gl.vertexAttribPointer(aLoc, 2, gl.FLOAT, false, 0, 0);
+
+const uRes   = gl.getUniformLocation(prog, 'u_res');
+const uTime  = gl.getUniformLocation(prog, 'u_time');
+const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+const uVel   = gl.getUniformLocation(prog, 'u_vel');
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let W, H;
+let mx, my;        // raw mouse
+let smx, smy;      // smoothed mouse
+let pvx=0, pvy=0;  // prev smoothed (for velocity)
+let svx=0, svy=0;  // smoothed velocity
+
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  mx = smx = W / 2;
+  my = smy = H / 2;
+  gl.viewport(0, 0, W, H);
+}
+resize();
+window.addEventListener('resize', resize);
+window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+// ─── LOOP ────────────────────────────────────────────────────────────────────
+const t0 = performance.now();
+function loop() {
+  requestAnimationFrame(loop);
+
+  // Smooth mouse position
+  smx += (mx - smx) * 0.1;
+  smy += (my - smy) * 0.1;
+
+  // Smooth velocity
+  const rawVx = smx - pvx;
+  const rawVy = smy - pvy;
+  svx += (rawVx - svx) * 0.2;
+  svy += (rawVy - svy) * 0.2;
+  pvx = smx; pvy = smy;
+
+  const t = (performance.now() - t0) * 0.001;
+  gl.uniform2f(uRes,   W, H);
+  gl.uniform1f(uTime,  t);
+  gl.uniform2f(uMouse, smx, smy);
+  gl.uniform2f(uVel,   svx, svy);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+}
+loop();
+</script>
+</body>
+</html>

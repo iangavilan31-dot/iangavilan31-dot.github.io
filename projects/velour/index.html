@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>VELOUR — a jazz night</title>
+    <meta
+      name="description"
+      content="VELOUR. One night inside a jazz bar, told through scroll. Arrive, settle, the band plays, the night deepens, last call, silence."
+    />
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=cabinet-grotesk@500,700,800&f[]=satoshi@400,500,700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="./assets/index-Dv2xuBbs.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DB-AkB9x.css">
+  </head>
+  <body>
+    <!-- The 3D night. Fixed, full-bleed, behind everything. -->
+    <canvas id="scene"></canvas>
+
+    <!-- Editorial overlay: real selectable HTML, choreographed by scroll. -->
+    <main id="overlay" aria-hidden="false">
+      <!-- Rotated meta system (running up the margins) -->
+      <div class="meta meta--left" data-meta-left>
+        <span class="meta__num" data-meta-num>I</span>
+        <span class="meta__name" data-meta-name>ARRIVE</span>
+      </div>
+      <div class="meta meta--right">
+        <span class="meta__run">VELOUR &nbsp;—&nbsp; LIVE JAZZ &nbsp;·&nbsp; NIGHTLY</span>
+      </div>
+
+      <!-- ACT I — ARRIVE -->
+      <section class="act act--1" data-act="1">
+        <h1 class="velour" data-fx="title">VELOUR</h1>
+        <p class="sub" data-fx="sub">a jazz bar · somewhere off the wet street · open till the night gives out</p>
+      </section>
+
+      <!-- ACT II — SETTLE -->
+      <section class="act act--2" data-act="2">
+        <div class="stack" data-fx="stack">
+          <span>the door</span>
+          <span>closes.</span>
+          <span>the city</span>
+          <span>goes quiet.</span>
+        </div>
+      </section>
+
+      <!-- ACT III — THE SET BEGINS -->
+      <section class="act act--3" data-act="3">
+        <p class="ghost" data-fx="ghost">and then — the first note</p>
+      </section>
+
+      <!-- ACT IV — DEEP NIGHT -->
+      <section class="act act--4" data-act="4">
+        <p class="poem" data-fx="poem">
+          somewhere between the first note and the last,
+          <em>you forgot everything else.</em>
+        </p>
+      </section>
+
+      <!-- ACT V — LAST CALL -->
+      <section class="act act--5" data-act="5">
+        <p class="lastcall" data-fx="lastcall">see you next week.</p>
+      </section>
+
+      <!-- Vinyl audio toggle -->
+      <button id="vinyl" class="vinyl" aria-label="Toggle music" title="Music">
+        <span class="vinyl__disc">
+          <span class="vinyl__label"></span>
+          <span class="vinyl__hole"></span>
+        </span>
+        <span class="vinyl__txt" data-vinyl-txt>play</span>
+      </button>
+
+      <!-- Scroll hint -->
+      <div class="hint" data-hint>
+        <span class="hint__word">scroll</span>
+        <span class="hint__line"></span>
+      </div>
+    </main>
+
+    <!-- Intro gate — a click to wake the room (and unlock audio). -->
+    <div id="gate" class="gate">
+      <div class="gate__inner">
+        <p class="gate__kicker">tonight at velour</p>
+        <h2 class="gate__title">a jazz night</h2>
+        <p class="gate__note">headphones, low light, no hurry</p>
+        <button class="gate__enter" id="enter">step inside</button>
+        <p class="gate__sound">sound on ·  for the full room</p>
+      </div>
+    </div>
+
+    <!-- Virtual scroll length -->
+    <div class="scroll-track" id="scroll-track"></div>
+
+  </body>
+</html>

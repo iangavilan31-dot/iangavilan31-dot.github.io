@@ -1,0 +1,52 @@
+[
+  {
+    "id": "n1",
+    "category": "Performance Academy",
+    "kind": "apply",
+    "kindLabel": "Apply",
+    "date": "Reopens fall 2026",
+    "title": "SPA 2027 applications open this fall",
+    "body": "Applications for the 2026 Sphinx Performance Academy are closed — the 2027 cycle reopens in fall 2026. Full-scholarship summer study for Black and Latinx string players at partner conservatories.",
+    "source": { "label": "sphinxmusic.org", "url": "https://www.sphinxmusic.org/sphinx-performance-academy" }
+  },
+  {
+    "id": "n2",
+    "category": "Sphinx Virtuosi",
+    "kind": "upcoming",
+    "kindLabel": "Upcoming",
+    "date": "Oct 16, 2026 · Carnegie Hall",
+    "title": "Sphinx Virtuosi return to Carnegie Hall",
+    "body": "The self-conducted string orchestra headlines Carnegie Hall with violinist Amaryn Olmeda, marking America's 250th with new works — including a song cycle by Damien Geter with a libretto by Sphinx founder Aaron P. Dworkin, featuring mezzo-soprano J'Nai Bridges.",
+    "source": { "label": "Carnegie Hall", "url": "https://www.carnegiehall.org/Calendar/2026/10/16/Sphinx-Virtuosi-0730PM" }
+  },
+  {
+    "id": "n3",
+    "category": "Sphinx Competition",
+    "kind": "recap",
+    "kindLabel": "Results",
+    "date": "Jan 24, 2026 · Detroit",
+    "title": "Andres Sanchez wins the Robert Frederick Smith Prize",
+    "body": "At the 29th Annual Sphinx Competition finals in Detroit, Andres Sanchez took the Senior Division's top honor. Finalists performed with the Sphinx Symphony Orchestra for a share of more than $100,000 in prizes.",
+    "source": { "label": "sphinxmusic.org", "url": "https://www.sphinxmusic.org/sphinx-calendar/sphinx-competition-finals-concert-2026" }
+  },
+  {
+    "id": "n4",
+    "category": "Sphinx Competition",
+    "kind": "apply",
+    "kindLabel": "Apply",
+    "date": "Opens spring 2026",
+    "title": "2027 Sphinx Competition applications open",
+    "body": "The next Sphinx Competition opens for applications in spring 2026 — for Black and Latinx string players in the Junior (up to 17) and Senior (18–35) divisions.",
+    "source": { "label": "sphinxmusic.org", "url": "https://www.sphinxmusic.org/sphinx-competition" }
+  },
+  {
+    "id": "n5",
+    "category": "Sphinx Virtuosi",
+    "kind": "recap",
+    "kindLabel": "Recap",
+    "date": "Feb–Mar 2026 · national tour",
+    "title": "Spring tour with Randall Goosby wraps",
+    "body": "Sphinx Virtuosi toured with violinist Randall Goosby from Feb 19 through Mar 15, 2026, with stops from Emory University to the Colburn School.",
+    "source": { "label": "NYS Music", "url": "https://nysmusic.com/2025/08/30/sphinx-organization-announces-2025-2026-highlights/" }
+  }
+]

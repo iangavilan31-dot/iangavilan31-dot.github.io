@@ -1,0 +1,403 @@
+:root {
+  --bg: #050505;
+  --surface: #0d0d0d;
+  --surface-soft: #141414;
+  --text: #f4f1ea;
+  --muted: #beb8aa;
+  --line: rgba(255, 255, 255, 0.14);
+  --accent: #d9c8a1;
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+  --max-width: 1180px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "Manrope", sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(217, 200, 161, 0.08), transparent 28%),
+    var(--bg);
+  color: var(--text);
+}
+
+img {
+  display: block;
+  width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+main {
+  min-height: 100vh;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(14px);
+  background: rgba(5, 5, 5, 0.92);
+  border-bottom: 1px solid var(--line);
+}
+
+.nav-shell,
+.footer-shell,
+.hero,
+.split-showcase,
+.about-preview,
+.video-section,
+.page-shell,
+.bio-content {
+  width: min(calc(100% - 2rem), var(--max-width));
+  margin: 0 auto;
+}
+
+.nav-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 78px;
+  gap: 1rem;
+}
+
+.brand {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.65rem;
+  letter-spacing: 0.06em;
+}
+
+.menu-toggle {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.5rem 0.85rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  position: relative;
+  color: var(--muted);
+  font-size: 0.95rem;
+  transition: color 180ms ease;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.45rem;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--text);
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after {
+  transform: scaleX(1);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 4rem;
+  align-items: center;
+  padding: 5.5rem 0 4rem;
+}
+
+.eyebrow,
+.project-tag,
+.card-date {
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.76rem;
+}
+
+h1,
+h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 600;
+  line-height: 0.95;
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(3.6rem, 9vw, 7rem);
+  max-width: 7ch;
+}
+
+h2 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  margin-top: 0.7rem;
+}
+
+.hero-subtitle,
+.lead-text,
+.copy-card p,
+.info-card p,
+.project-card p,
+.bio-text p,
+.community-card p,
+.section-note {
+  color: var(--muted);
+  line-height: 1.8;
+  font-size: 1.02rem;
+}
+
+.hero-subtitle {
+  max-width: 38rem;
+  margin: 1.35rem 0 2rem;
+}
+
+.button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  padding: 0.95rem 1.3rem;
+  border-radius: 999px;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.button-link:hover {
+  transform: translateY(-2px);
+  border-color: rgba(217, 200, 161, 0.5);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.hero-image-frame,
+.feature-image,
+.community-card img {
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.split-showcase,
+.about-preview,
+.video-section,
+.page-intro,
+.card-grid,
+.stacked-projects,
+.community-grid {
+  padding-bottom: 4.5rem;
+}
+
+.section-heading.narrow,
+.lead-text {
+  max-width: 58rem;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.copy-card,
+.info-card,
+.project-card,
+.video-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 2rem;
+}
+
+.page-shell {
+  padding-top: 4rem;
+}
+
+.page-intro {
+  max-width: 54rem;
+}
+
+.card-grid,
+.community-grid,
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.info-card h2,
+.project-card h2,
+.community-card h2 {
+  font-size: 1.9rem;
+  line-height: 1.1;
+  margin: 0.8rem 0 1rem;
+}
+
+.stacked-projects {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.project-card a {
+  display: inline-block;
+  margin-top: 1rem;
+  color: var(--accent);
+}
+
+.community-card {
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.community-card div {
+  padding: 1.5rem;
+}
+
+.bio-hero {
+  position: relative;
+  min-height: calc(100vh - 78px);
+  display: flex;
+  align-items: center;
+  background-image: url("assets/bio-background.svg");
+  background-size: cover;
+  background-position: center;
+}
+
+.bio-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.66),
+    rgba(0, 0, 0, 0.78)
+  );
+}
+
+.bio-content {
+  position: relative;
+  z-index: 1;
+  padding: 5rem 0;
+  max-width: 64rem;
+}
+
+.bio-content h1 {
+  max-width: 12ch;
+  margin-bottom: 2rem;
+}
+
+.bio-text {
+  max-width: 50rem;
+}
+
+.video-grid {
+  margin-top: 2rem;
+}
+
+.video-card iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 18px;
+  margin-bottom: 1rem;
+}
+
+.video-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+}
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  margin-top: 2rem;
+}
+
+.footer-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 0 2rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 960px) {
+  .hero,
+  .showcase-grid,
+  .card-grid,
+  .community-grid,
+  .video-grid {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    max-width: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .nav-shell {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 1rem 0;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+  }
+
+  .nav-links {
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.75rem 0 0.2rem;
+    gap: 1rem;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .hero {
+    padding-top: 3.2rem;
+    gap: 2rem;
+  }
+
+  .hero-image-frame {
+    max-width: 28rem;
+  }
+
+  .footer-shell {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
