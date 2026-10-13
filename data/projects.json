@@ -24,7 +24,7 @@
     "id": "impossible-lab",
     "title": "Impossible Lab",
     "category": "Games",
-    "summary": "A first-person puzzle laboratory where the rooms refuse to behave.",
+    "summary": "Four strange worlds. Turn channels, tune a colony, grow a garden, and survive a moving relay.",
     "status": "Live demo",
     "url": "./projects/impossible-lab/",
     "downloadUrl": "",
@@ -36,15 +36,15 @@
     ],
     "featured": true,
     "detail": {
-      "Idea": "A laboratory where each world has a different rule, and discoveries can be combined across worlds.",
-      "Work": "A first-person browser game with four experiments, a journal, local saves and an ending. The creatures use original procedural geometry and articulated rigs in Three.js; the interface uses React.",
-      "Try": "Collect the four cores, combine three discoveries at the workbench, and bring them to the reactor.",
-      "Development": "Folio gained a readable chambered shell and moving sensory fans. Captain Liability now physically opens during the valid pulse window. Aurelia's bells react to tuning. Camera bounds, collision and field-note typography were refined together.",
-      "Takeaway": "The creature's pose, the attack effect and the valid player action need to follow the same clock. A convincing tell must also be mechanically true."
+      "Idea": "A laboratory where each world follows a different rule, and discoveries can be combined across worlds.",
+      "Work": "A first-person browser game with four worlds, a journal, local saves and an ending. Its field campaign adds three transfer plates, three linked colonies, three water gardens, a six-seal relay and three physical hybrid proofs. The creatures use original procedural geometry and articulated rigs in Three.js; the interface uses React.",
+      "Try": "Collect the four cores, finish each field instrument, and test three hybrids in the rooms. Bring seven field records and your discoveries to the reactor.",
+      "Development": "The field campaign builds on the creature, camera, collision and type work. Rotating channels carry a visible print; shared notes change a swimming colony; six conserved drops grow three gardens. The relay uses timed jumps and pulses. Old saves keep their earlier ending, and new games use the expanded campaign.",
+      "Takeaway": "Using the same clock for poses, hazards and actions made the rules visible in the world. Real play recordings show those changes across all four rooms."
     },
     "mascot": "./assets/mascot-frog.png",
     "mascotSheet": "./assets/mascot-frog-sheet.png",
-    "video": "./assets/videos/impossible-lab.mp4",
+    "video": "./assets/videos/impossible-lab-four-worlds.mp4",
     "comparison": {
       "before": "./assets/lab-before.jpg",
       "after": "./assets/lab-after.jpg",
