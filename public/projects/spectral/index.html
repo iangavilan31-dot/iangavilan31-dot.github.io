@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SPECTRAL — audio visualizer</title>
+<style>
+  :root { --accent: #5cf2ff; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #04030a; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; color: #eaf6ff; cursor: default; }
+  body.hidecursor { cursor: none; }
+  #c { display: block; position: fixed; inset: 0; width: 100vw; height: 100vh; }
+
+  /* ---- Start overlay ---- */
+  #overlay {
+    position: fixed; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 22px;
+    background: radial-gradient(120% 120% at 50% 40%, rgba(20,16,40,.55), rgba(4,3,10,.92));
+    backdrop-filter: blur(2px); z-index: 10; transition: opacity .5s ease;
+  }
+  #overlay.gone { opacity: 0; pointer-events: none; }
+  .wordmark {
+    font-weight: 800; letter-spacing: .42em; font-size: clamp(34px, 7vw, 92px);
+    text-transform: uppercase; padding-left: .42em;
+    background: linear-gradient(90deg, #5cf2ff, #b56cff 55%, #ff6ad5);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 26px rgba(120,120,255,.45));
+  }
+  .sub { opacity: .72; font-size: clamp(13px, 1.4vw, 16px); max-width: 560px; text-align: center; line-height: 1.6; }
+  .sub b { color: var(--accent); font-weight: 600; }
+  #startBtn {
+    margin-top: 6px; cursor: pointer; border: 1px solid rgba(120,200,255,.5);
+    background: rgba(92,242,255,.08); color: #eaf6ff; font-size: 17px; font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase; padding: 16px 38px; border-radius: 999px;
+    transition: transform .15s ease, background .2s ease, box-shadow .2s ease;
+    box-shadow: 0 0 0 rgba(92,242,255,0);
+  }
+  #startBtn:hover { transform: translateY(-2px); background: rgba(92,242,255,.18); box-shadow: 0 0 38px rgba(92,242,255,.35); }
+  #previewBtn { color: #bfe9ff; font: inherit; background: none; border: 0; padding: 8px; text-decoration: underline; cursor: pointer; }
+  #previewNotice { position: fixed; left: 18px; top: 18px; color: #bfe9ff; font-size: 12px; z-index: 8; }
+  #err { color: #ff8aa5; font-size: 14px; max-width: 560px; text-align: center; min-height: 18px; line-height: 1.5; }
+
+  /* ---- HUD ---- */
+  #hud {
+    position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+    display: flex; gap: 10px; align-items: center; z-index: 8;
+    background: rgba(10,8,22,.5); border: 1px solid rgba(120,160,255,.18);
+    padding: 8px 12px; border-radius: 999px; backdrop-filter: blur(8px);
+    transition: opacity .4s ease; font-size: 12px;
+  }
+  #hud.hide { opacity: 0; pointer-events: none; }
+  .pill {
+    font: inherit; background: transparent;
+    cursor: pointer; padding: 7px 13px; border-radius: 999px; color: #cfe6ff;
+    border: 1px solid transparent; user-select: none; transition: all .15s ease; letter-spacing: .04em;
+  }
+  .pill:hover { background: rgba(120,160,255,.14); }
+  .pill.on { background: rgba(92,242,255,.18); border-color: rgba(92,242,255,.4); color: #eafdff; }
+  .sep { width: 1px; height: 18px; background: rgba(120,160,255,.2); margin: 0 4px; }
+
+  #modeLabel {
+    position: fixed; top: 28px; left: 50%; transform: translateX(-50%);
+    font-size: 13px; letter-spacing: .5em; text-transform: uppercase; padding-left: .5em;
+    color: #bfe9ff; opacity: 0; transition: opacity .5s ease; z-index: 7; text-shadow: 0 0 16px rgba(92,242,255,.6);
+  }
+  #modeLabel.show { opacity: .9; }
+  #help {
+    position: fixed; right: 18px; top: 16px; z-index: 7; font-size: 11.5px; opacity: .35;
+    line-height: 1.7; text-align: right; transition: opacity .4s ease; pointer-events: none;
+  }
+  #help.hide { opacity: 0; }
+  kbd { font-family: inherit; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14);
+        border-radius: 4px; padding: 1px 6px; font-size: 11px; }
+</style>
+</head>
+<body class="hidecursor">
+  <canvas id="c"></canvas>
+
+  <div id="modeLabel"></div>
+  <div id="previewNotice" hidden>Visual preview · no audio input</div>
+  <div id="help" class="hide">
+    <kbd>Space</kbd> / click — next mode<br>
+    <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> — pick mode<br>
+    <kbd>F</kbd> — fullscreen &nbsp; <kbd>H</kbd> — hide UI
+  </div>
+
+  <div id="hud" class="hide">
+    <button type="button" class="pill on" data-mode="0">Aurora</button>
+    <button type="button" class="pill" data-mode="1">Nebula</button>
+    <button type="button" class="pill" data-mode="2">Rings</button>
+    <span class="sep"></span>
+    <button type="button" class="pill" id="fsBtn">⛶ Fullscreen</button>
+  </div>
+
+  <div id="overlay">
+    <div class="wordmark">Spectral</div>
+    <div class="sub">
+      A live audio visualizer for your second monitor. When the share picker opens,
+      choose <b>Entire Screen</b> and tick <b>“Also share system audio”</b> — that's how it hears Spotify.
+    </div>
+    <button id="startBtn">▶ Start Visualizer</button>
+    <button id="previewBtn" type="button">Try a silent visual preview</button>
+    <div id="err"></div>
+    <div class="sub" style="opacity:.45;font-size:12px">Best in Chrome or Edge · nothing is recorded or sent anywhere — it stays on your machine.</div>
+  </div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  const overlay = document.getElementById('overlay');
+  const startBtn = document.getElementById('startBtn');
+  const errEl = document.getElementById('err');
+  const hud = document.getElementById('hud');
+  const help = document.getElementById('help');
+  const modeLabel = document.getElementById('modeLabel');
+
+  let W = 0, H = 0, DPR = 1;
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W * DPR; canvas.height = H * DPR;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ---------- audio ----------
+  const NUM_BANDS = 96;
+  let analyser = null, freq = null, wave = null, bandRanges = null;
+  let started = false;
+  let preview = false;
+  const bands = new Float32Array(NUM_BANDS);   // smoothed per-band amplitude 0..1
+  let bass = 0, level = 0;                      // smoothed bass / overall
+  let bassAvg = 0.0001, beat = 0, beatCooldown = 0;
+
+  function buildBandRanges(binCount, sampleRate) {
+    const nyq = sampleRate / 2, minF = 30, maxF = 16000, r = [];
+    for (let i = 0; i < NUM_BANDS; i++) {
+      const f0 = minF * Math.pow(maxF / minF, i / NUM_BANDS);
+      const f1 = minF * Math.pow(maxF / minF, (i + 1) / NUM_BANDS);
+      let b0 = Math.floor(f0 / nyq * binCount);
+      let b1 = Math.ceil(f1 / nyq * binCount);
+      b0 = Math.max(0, Math.min(binCount - 1, b0));
+      b1 = Math.max(b0 + 1, Math.min(binCount, b1));
+      r.push([b0, b1]);
+    }
+    return r;
+  }
+
+  async function start() {
+    errEl.textContent = '';
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getDisplayMedia({
+        video: { frameRate: 1 },
+        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+      });
+    } catch (e) {
+      errEl.textContent = 'Screen-share was cancelled or blocked. Click start and allow it to hear your audio.';
+      return;
+    }
+    const aTracks = stream.getAudioTracks();
+    if (!aTracks.length) {
+      stream.getTracks().forEach(t => t.stop());
+      errEl.innerHTML = 'No audio came through. Re-click start, pick <b>Entire Screen</b>, and make sure <b>“Also share system audio”</b> is checked.';
+      return;
+    }
+    stream.getVideoTracks().forEach(t => t.stop()); // we only want the audio
+
+    const AC = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AC();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const src = audioCtx.createMediaStreamSource(new MediaStream(aTracks));
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 4096;
+    analyser.smoothingTimeConstant = 0.82;
+    src.connect(analyser); // NOT to destination — avoids echo, audio still plays normally via Spotify
+
+    freq = new Uint8Array(analyser.frequencyBinCount);
+    wave = new Uint8Array(analyser.fftSize);
+    bandRanges = buildBandRanges(analyser.frequencyBinCount, audioCtx.sampleRate);
+
+    aTracks[0].addEventListener('ended', reset); // user clicked "Stop sharing"
+
+    started = true;
+    preview = false;
+    document.getElementById('previewNotice').hidden = true;
+    overlay.classList.add('gone');
+    hud.classList.remove('hide');
+    help.classList.remove('hide');
+    setTimeout(() => help.classList.add('hide'), 6000);
+    flashMode();
+  }
+
+  function reset() {
+    started = false; analyser = null;
+    overlay.classList.remove('gone');
+    hud.classList.add('hide');
+    errEl.innerHTML = 'Audio sharing stopped. Click start to begin again.';
+  }
+
+  function readAudio() {
+    if (!analyser) return;
+    analyser.getByteFrequencyData(freq);
+    analyser.getByteTimeDomainData(wave);
+    let sum = 0;
+    for (let i = 0; i < NUM_BANDS; i++) {
+      const [b0, b1] = bandRanges[i];
+      let m = 0;
+      for (let b = b0; b < b1; b++) if (freq[b] > m) m = freq[b];
+      let amp = m / 255;
+      amp *= 0.62 + 0.85 * (i / NUM_BANDS);            // perceptual tilt: lift the highs
+      amp = Math.min(1, amp);
+      bands[i] += (amp - bands[i]) * (amp > bands[i] ? 0.55 : 0.14); // fast attack, slow release
+      sum += bands[i];
+    }
+    level += (sum / NUM_BANDS - level) * 0.2;
+
+    // bass / beat (lowest ~8 bands)
+    let b = 0; for (let i = 0; i < 8; i++) b += bands[i]; b /= 8;
+    bass += (b - bass) * 0.3;
+    bassAvg += (bass - bassAvg) * 0.04;
+    beatCooldown--;
+    if (bass > bassAvg * 1.35 && bass > 0.18 && beatCooldown <= 0) { beat = 1; beatCooldown = 9; }
+    else beat *= 0.86;
+  }
+
+  // ---------- idle (pre-audio eye-candy) ----------
+  function readIdle(t) {
+    let sum = 0;
+    for (let i = 0; i < NUM_BANDS; i++) {
+      const x = i / NUM_BANDS;
+      const a = (Math.sin(t * 0.0014 + x * 7) * 0.5 + 0.5) *
+                (Math.sin(t * 0.0007 + x * 13 + 1.7) * 0.5 + 0.5) * (1 - x * 0.45);
+      bands[i] += (a * 0.6 - bands[i]) * 0.08; sum += bands[i];
+    }
+    level += (sum / NUM_BANDS - level) * 0.05;
+    bass = (Math.sin(t * 0.0016) * 0.5 + 0.5) * 0.4;
+    beat *= 0.9;
+  }
+
+  // ---------- helpers ----------
+  function hue(i, t) { return (i / NUM_BANDS * 290 + t * 0.012) % 360; }
+
+  // ---------- modes ----------
+  let mode = 0;
+  const MODE_NAMES = ['Aurora', 'Nebula', 'Rings'];
+
+  // Mode 0 — Aurora: mirrored radial spectrum + pulsing core
+  let rot = 0;
+  function drawAurora(t) {
+    const cx = W / 2, cy = H / 2;
+    const baseR = Math.min(W, H) * (0.17 + bass * 0.05);
+    rot += 0.0015 + level * 0.006;
+
+    // pulsing core glow
+    const coreR = baseR * (0.55 + beat * 0.5 + bass * 0.4);
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR);
+    g.addColorStop(0, `hsla(${(t*0.03)%360},100%,70%,${0.5 + beat*0.4})`);
+    g.addColorStop(0.5, `hsla(${(t*0.03+60)%360},100%,60%,0.18)`);
+    g.addColorStop(1, 'hsla(0,0%,0%,0)');
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(cx, cy, coreR, 0, Math.PI * 2); ctx.fill();
+
+    const N = NUM_BANDS, maxLen = Math.min(W, H) * 0.42;
+    for (let half = 0; half < 2; half++) {
+      for (let i = 0; i < N; i++) {
+        const amp = bands[i];
+        const ang = rot + (half ? -1 : 1) * (i / N) * Math.PI + (half ? Math.PI : 0);
+        const len = 4 + amp * maxLen;
+        const x0 = cx + Math.cos(ang) * baseR, y0 = cy + Math.sin(ang) * baseR;
+        const x1 = cx + Math.cos(ang) * (baseR + len), y1 = cy + Math.sin(ang) * (baseR + len);
+        const h = hue(i, t);
+        ctx.strokeStyle = `hsla(${h},100%,${55 + amp * 25}%,${0.35 + amp * 0.6})`;
+        ctx.lineWidth = (W < 700 ? 2 : 3) + amp * 3;
+        ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+        // bright tip
+        ctx.fillStyle = `hsla(${h},100%,80%,${amp})`;
+        ctx.beginPath(); ctx.arc(x1, y1, 1.5 + amp * 3, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    // inner ring
+    ctx.strokeStyle = `hsla(${(t*0.04)%360},90%,70%,${0.25 + bass*0.5})`;
+    ctx.lineWidth = 1.5 + beat * 3;
+    ctx.beginPath(); ctx.arc(cx, cy, baseR, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // Mode 1 — Nebula: particle field driven by bass + beats
+  const P = [];
+  const PCOUNT = 230;
+  function initParticles() {
+    P.length = 0;
+    for (let i = 0; i < PCOUNT; i++) {
+      const a = Math.random() * Math.PI * 2, r = Math.random() * 0.5;
+      P.push({ a, r, x: 0, y: 0, sp: 0.2 + Math.random() * 0.8, sz: 0.6 + Math.random() * 2.2, band: (i % NUM_BANDS) });
+    }
+  }
+  initParticles();
+  function drawNebula(t) {
+    const cx = W / 2, cy = H / 2, maxR = Math.min(W, H) * 0.5;
+    ctx.globalCompositeOperation = 'lighter';
+    const push = bass * 0.9 + beat * 1.4;
+    for (let i = 0; i < P.length; i++) {
+      const p = P[i];
+      p.a += (0.0008 + p.sp * 0.0015) * (1 + level * 2);
+      const amp = bands[p.band];
+      const target = 0.12 + p.r * 0.7 + push * 0.45 + amp * 0.35;
+      p.cur = (p.cur || target) + (target - (p.cur || target)) * 0.12;
+      const rr = p.cur * maxR;
+      const x = cx + Math.cos(p.a) * rr, y = cy + Math.sin(p.a) * rr;
+      const h = hue(p.band, t);
+      const sz = p.sz * (1 + amp * 2.5 + beat * 1.5);
+      const al = 0.18 + amp * 0.7;
+      ctx.fillStyle = `hsla(${h},100%,${60 + amp*30}%,${al})`;
+      ctx.beginPath(); ctx.arc(x, y, sz, 0, Math.PI * 2); ctx.fill();
+      // connecting filament to center on strong beats
+      if (beat > 0.5 && amp > 0.4) {
+        ctx.strokeStyle = `hsla(${h},100%,70%,${amp*0.25})`;
+        ctx.lineWidth = 0.6;
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+      }
+    }
+    // bass core
+    const cr = (0.04 + bass * 0.16) * Math.min(W, H);
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
+    g.addColorStop(0, `hsla(${(t*0.05)%360},100%,75%,${0.5 + beat*0.4})`);
+    g.addColorStop(1, 'hsla(0,0%,0%,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, cr, 0, Math.PI * 2); ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // Mode 2 — Rings: concentric waveform rings
+  function drawRings(t) {
+    if (!started) { drawRingsIdle(t); return; }
+    const cx = W / 2, cy = H / 2;
+    const baseR = Math.min(W, H) * 0.1;
+    const RINGS = 5, step = Math.min(W, H) * 0.07;
+    ctx.globalCompositeOperation = 'lighter';
+    const len = wave.length;
+    for (let ring = 0; ring < RINGS; ring++) {
+      const rad = baseR + ring * step + bass * 30;
+      const h = (t * 0.03 + ring * 40) % 360;
+      ctx.strokeStyle = `hsla(${h},100%,65%,${0.5 - ring*0.06})`;
+      ctx.lineWidth = 2 + (RINGS - ring) * 0.6 + beat * 2;
+      ctx.beginPath();
+      const SEG = 180;
+      for (let s = 0; s <= SEG; s++) {
+        const ang = (s / SEG) * Math.PI * 2;
+        const wi = Math.floor((s / SEG) * len) % len;
+        const v = (wave[wi] - 128) / 128;            // -1..1
+        const rr = rad + v * (24 + ring * 10 + level * 60);
+        const x = cx + Math.cos(ang) * rr, y = cy + Math.sin(ang) * rr;
+        if (s === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath(); ctx.stroke();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+  function drawRingsIdle(t) {
+    const cx = W / 2, cy = H / 2;
+    ctx.globalCompositeOperation = 'lighter';
+    for (let ring = 0; ring < 5; ring++) {
+      const rad = Math.min(W, H) * (0.1 + ring * 0.07) + bass * 30;
+      ctx.strokeStyle = `hsla(${(t*0.03+ring*40)%360},100%,65%,${0.4 - ring*0.06})`;
+      ctx.lineWidth = 2; ctx.beginPath();
+      for (let s = 0; s <= 180; s++) {
+        const ang = (s / 180) * Math.PI * 2;
+        const rr = rad + Math.sin(ang * 6 + t * 0.002 + ring) * (10 + level * 50);
+        const x = cx + Math.cos(ang) * rr, y = cy + Math.sin(ang) * rr;
+        if (s === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.closePath(); ctx.stroke();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // ---------- loop ----------
+  function frame(t) {
+    if (started) readAudio(); else readIdle(t);
+
+    // motion-blur trail (deep near-black with a hint of blue)
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = `rgba(4,3,12,${mode === 1 ? 0.16 : 0.22})`;
+    ctx.fillRect(0, 0, W, H);
+
+    if (mode === 0) drawAurora(t);
+    else if (mode === 1) drawNebula(t);
+    else drawRings(t);
+
+    // subtle vignette
+    const vg = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.3, W/2, H/2, Math.max(W,H)*0.75);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.45)');
+    ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // ---------- UI / controls ----------
+  function setMode(m) {
+    mode = ((m % 3) + 3) % 3;
+    document.querySelectorAll('.pill[data-mode]').forEach(p =>
+      p.classList.toggle('on', +p.dataset.mode === mode));
+    flashMode();
+  }
+  function flashMode() {
+    modeLabel.textContent = MODE_NAMES[mode];
+    modeLabel.classList.add('show');
+    clearTimeout(flashMode._t);
+    flashMode._t = setTimeout(() => modeLabel.classList.remove('show'), 1400);
+  }
+
+  startBtn.addEventListener('click', start);
+  document.getElementById('previewBtn').addEventListener('click', () => {
+    preview = true;
+    overlay.classList.add('gone');
+    hud.classList.remove('hide');
+    help.classList.remove('hide');
+    document.getElementById('previewNotice').hidden = false;
+    flashMode();
+  });
+  document.querySelectorAll('.pill[data-mode]').forEach(p =>
+    p.addEventListener('click', () => setMode(+p.dataset.mode)));
+  document.getElementById('fsBtn').addEventListener('click', toggleFs);
+
+  function toggleFs() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+    else document.exitFullscreen?.();
+  }
+
+  // click on canvas cycles mode (but not while overlay is up)
+  canvas.addEventListener('click', () => { if (started || preview) setMode(mode + 1); });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === ' ') { e.preventDefault(); if (started || preview) setMode(mode + 1); }
+    else if (e.key === '1') setMode(0);
+    else if (e.key === '2') setMode(1);
+    else if (e.key === '3') setMode(2);
+    else if (e.key.toLowerCase() === 'f') toggleFs();
+    else if (e.key.toLowerCase() === 'h') { hud.classList.toggle('hide'); help.classList.toggle('hide'); }
+  });
+
+  // auto-hide cursor when idle
+  let cursorTimer;
+  window.addEventListener('mousemove', () => {
+    document.body.classList.remove('hidecursor');
+    clearTimeout(cursorTimer);
+    cursorTimer = setTimeout(() => document.body.classList.add('hidecursor'), 2200);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ambient Weather</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #020206;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: block;
+}
+
+/* Vignette — darkens edges so text reads cleanly */
+.vignette {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 140% 110% at 50% 50%,
+    transparent 25%,
+    rgba(0,0,0,0.45) 70%,
+    rgba(0,0,0,0.75) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Extra bottom gradient for text legibility */
+.bottom-fade {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 45%;
+  background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Info overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+/* Top row: time + location */
+.ov-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.ov-time {
+  font-weight: 200;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  color: rgba(215,208,195,0.38);
+  font-variant-numeric: tabular-nums;
+}
+
+.ov-location-wrap {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  align-items: flex-end;
+}
+
+.ov-city {
+  font-weight: 300;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(215,208,195,0.32);
+}
+
+.ov-coords {
+  font-weight: 200;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: rgba(150,145,135,0.2);
+}
+
+/* Bottom row: main weather info */
+.ov-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.ov-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.ov-temp {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(5.5rem, 16vw, 10rem);
+  color: rgba(238,232,220,0.88);
+  line-height: 0.82;
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+}
+
+.ov-unit {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: rgba(200,169,110,0.6);
+  vertical-align: super;
+  line-height: 1;
+}
+
+.ov-condition {
+  font-weight: 300;
+  font-size: clamp(0.68rem, 1.5vw, 0.85rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(200,169,110,0.72);
+  margin-bottom: 0.4rem;
+}
+
+.ov-feels {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(0.82rem, 1.8vw, 1rem);
+  color: rgba(170,164,152,0.38);
+}
+
+.ov-right {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding-bottom: 0.4rem;
+}
+
+.ov-hilo {
+  font-weight: 300;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: rgba(170,164,152,0.3);
+}
+
+.ov-wind {
+  font-weight: 200;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: rgba(140,135,125,0.22);
+}
+
+.ov-updated {
+  font-weight: 200;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: rgba(120,115,108,0.2);
+}
+
+/* Loading screen */
+.loading {
+  position: fixed;
+  inset: 0;
+  background: #020206;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  gap: 1.8rem;
+  transition: opacity 1.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+.loading.fade { opacity: 0; pointer-events: none; }
+
+.load-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-style: italic;
+  color: rgba(200,169,110,0.55);
+  letter-spacing: 0.04em;
+}
+
+.load-spinner {
+  display: flex;
+  gap: 6px;
+}
+
+.load-dot {
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: rgba(200,169,110,0.35);
+  animation: dotPulse 1.6s ease-in-out infinite;
+}
+.load-dot:nth-child(2) { animation-delay: 0.2s; }
+.load-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotPulse {
+  0%,100% { opacity: 0.15; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.load-msg {
+  font-weight: 200;
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(140,135,125,0.35);
+  min-height: 1.2em;
+  transition: opacity 0.4s;
+}
+
+/* Error */
+.err {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+.err.on { display: flex; }
+.err-msg {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  color: rgba(200,169,110,0.4);
+  text-align: center;
+  max-width: 280px;
+  line-height: 1.65;
+}
+.err-sub {
+  font-weight: 200;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  color: rgba(120,115,105,0.3);
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+<div class="vignette"></div>
+<div class="bottom-fade"></div>
+
+<div class="overlay">
+  <div class="ov-top">
+    <div class="ov-time" id="ovTime"></div>
+    <div class="ov-location-wrap">
+      <div class="ov-city" id="ovCity">Locating…</div>
+      <div class="ov-coords" id="ovCoords"></div>
+    </div>
+  </div>
+  <div class="ov-bottom">
+    <div class="ov-left">
+      <div class="ov-temp" id="ovTemp">–<span class="ov-unit">°</span></div>
+      <div class="ov-condition" id="ovCond">Reading the sky</div>
+      <div class="ov-feels" id="ovFeels"></div>
+    </div>
+    <div class="ov-right">
+      <div class="ov-hilo" id="ovHilo"></div>
+      <div class="ov-wind" id="ovWind"></div>
+      <div class="ov-updated" id="ovUpdated"></div>
+    </div>
+  </div>
+</div>
+
+<div class="loading" id="loading">
+  <div class="load-title">Ambient Weather</div>
+  <div class="load-spinner">
+    <div class="load-dot"></div>
+    <div class="load-dot"></div>
+    <div class="load-dot"></div>
+  </div>
+  <div class="load-msg" id="loadMsg">Locating you</div>
+</div>
+
+<div class="err" id="errEl">
+  <div class="err-msg">Couldn't reach the weather gods. Check your connection and reload.</div>
+  <div class="err-sub">Location access helps, but isn't required.</div>
+</div>
+
+<script>
+// =============================================================
+//  CANVAS + RESIZE
+// =============================================================
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W = 0, H = 0, DPR = 1;
+
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width  = W * DPR;
+  canvas.height = H * DPR;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.resetTransform();
+  ctx.scale(DPR, DPR);
+  initScene();
+}
+
+window.addEventListener('resize', () => { resize(); });
+
+// =============================================================
+//  STATE
+// =============================================================
+let wType      = 'clear';   // clear|cloudy|fog|drizzle|rain|snow|storm
+let windMph    = 0;
+let frame      = 0;
+
+let particles  = [];
+let stars      = [];
+let splashes   = [];
+
+// Lightning
+let boltPts    = null;
+let flashVal   = 0;
+let lightTimer = 0;
+
+// =============================================================
+//  HELPERS
+// =============================================================
+const r    = (a, b) => a + Math.random() * (b - a);
+const ri   = (a, b) => Math.floor(r(a, b + 1));
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+function tod() {
+  const h = new Date().getHours() + new Date().getMinutes() / 60;
+  if (h < 5 || h >= 22)  return 'night';
+  if (h < 7)             return 'dawn';
+  if (h < 10)            return 'morning';
+  if (h < 17)            return 'day';
+  if (h < 20)            return 'dusk';
+  return 'evening';
+}
+
+// =============================================================
+//  WMO CODES
+// =============================================================
+const WMO = {
+  0:'Clear sky', 1:'Mostly clear', 2:'Partly cloudy', 3:'Overcast',
+  45:'Foggy', 48:'Icy fog',
+  51:'Light drizzle', 53:'Drizzle', 55:'Heavy drizzle',
+  56:'Freezing drizzle', 57:'Heavy freezing drizzle',
+  61:'Light rain', 63:'Rain', 65:'Heavy rain',
+  66:'Freezing rain', 67:'Heavy freezing rain',
+  71:'Light snow', 73:'Snow', 75:'Heavy snow', 77:'Snow grains',
+  80:'Rain showers', 81:'Heavy showers', 82:'Violent showers',
+  85:'Snow showers', 86:'Heavy snow showers',
+  95:'Thunderstorm', 96:'Thunderstorm', 99:'Thunderstorm'
+};
+
+function codeToType(code) {
+  if (code <= 1)  return 'clear';
+  if (code <= 3)  return 'cloudy';
+  if (code <= 48) return 'fog';
+  if (code <= 57) return 'drizzle';
+  if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return 'rain';
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow';
+  if (code >= 95) return 'storm';
+  return 'clear';
+}
+
+// =============================================================
+//  BACKGROUND THEMES (very dark — art is the light source)
+// =============================================================
+const THEMES = {
+  clear:   ['#030310', '#060620', '#08081a'],
+  cloudy:  ['#060608', '#0c0c10', '#0e0e14'],
+  fog:     ['#07070a', '#0c0c0f', '#101012'],
+  drizzle: ['#04040c', '#06060e', '#080812'],
+  rain:    ['#030308', '#05050d', '#06060c'],
+  snow:    ['#04040e', '#06060c', '#08081c'],
+  storm:   ['#020205', '#040408', '#050508'],
+};
+
+// =============================================================
+//  PARTICLE FACTORIES
+// =============================================================
+
+function mkDust() {
+  const big = Math.random() > 0.85;
+  const med = !big && Math.random() > 0.55;
+  return {
+    t: 'dust',
+    x: r(0, W), y: r(0, H),
+    sz: big ? r(1.8, 3.5) : med ? r(1, 2) : r(0.3, 1),
+    vx: r(-0.1, 0.1),
+    vy: r(-0.4, -0.06),
+    op: r(0.15, 0.65),
+    opT: r(0.1, 0.75),
+    opSpd: r(0.003, 0.015),
+    hue: r(33, 52),
+    sat: r(40, 75),
+    lum: r(58, 82),
+    ph: r(0, Math.PI * 2),
+    drift: r(0.002, 0.01),
+  };
+}
+
+function mkStar() {
+  return {
+    t: 'star',
+    x: r(0, W), y: r(0, H * 0.88),
+    sz: r(0.25, 1.8),
+    op: r(0.2, 0.95),
+    tSpd: r(0.007, 0.028),
+    tPh: r(0, Math.PI * 2),
+  };
+}
+
+function mkCloudMote() {
+  return {
+    t: 'cmote',
+    x: r(-60, W + 60), y: r(0, H),
+    sz: r(0.5, 2.2),
+    vx: r(0.04, 0.28) * (Math.random() > 0.5 ? 1 : -1),
+    vy: r(-0.06, 0.06),
+    op: r(0.04, 0.22),
+  };
+}
+
+function mkFogBlob() {
+  return {
+    t: 'fog',
+    x: r(-300, W + 300), y: r(H * 0.05, H * 0.98),
+    radius: r(100, 550),
+    vx: r(0.06, 0.3) * (Math.random() > 0.5 ? 1 : -1),
+    op: r(0.014, 0.052),
+  };
+}
+
+function mkRain(layer) {
+  const angleRad = (12 + windMph * 0.6) * Math.PI / 180;
+  return {
+    t: 'rain',
+    x: r(-W * 0.3, W * 1.3), y: r(-H * 0.6, 0),
+    len: layer === 0 ? r(8, 22) : r(22, 50),
+    spd: layer === 0 ? r(9, 17) : r(18, 32),
+    op: layer === 0 ? r(0.06, 0.2) : r(0.18, 0.55),
+    ang: angleRad,
+    layer,
+  };
+}
+
+function mkSplash(x, y) {
+  return {
+    x, y,
+    rr: 1, maxR: r(6, 24),
+    op: r(0.25, 0.55),
+    spd: r(0.35, 0.85),
+  };
+}
+
+function mkSnow(layer) {
+  const cfg = [
+    { szR:[0.7,1.8], spdR:[0.18,0.65], opR:[0.25,0.6]  },
+    { szR:[1.8,3.2], spdR:[0.65,1.35], opR:[0.4,0.8]   },
+    { szR:[3.0,5.5], spdR:[1.3,2.2],   opR:[0.55,0.95]  },
+  ][layer];
+  return {
+    t: 'snow',
+    x: r(0, W), y: r(-40, H),
+    sz: r(...cfg.szR),
+    vy: r(...cfg.spdR),
+    driftAmp: r(0.15, 0.95),
+    driftPh: r(0, Math.PI * 2),
+    driftSpd: r(0.007, 0.022),
+    op: r(...cfg.opR),
+    layer,
+    isCrystal: layer === 2 && Math.random() > 0.35,
+  };
+}
+
+function mkDrizzle() {
+  const ang = (7 + windMph * 0.25) * Math.PI / 180;
+  return {
+    t: 'drizzle',
+    x: r(-W * 0.15, W * 1.15), y: r(-H * 0.5, 0),
+    len: r(4, 13),
+    spd: r(5, 13),
+    op: r(0.04, 0.17),
+    ang,
+  };
+}
+
+// =============================================================
+//  INIT SCENE
+// =============================================================
+function initScene() {
+  particles = []; stars = []; splashes = [];
+  flashVal = 0; boltPts = null; lightTimer = 0;
+
+  const t = tod();
+  const density = (W * H) / 1e6; // scale count to screen size
+
+  switch (wType) {
+    case 'clear': {
+      const n = Math.round(r(180, 320) * density);
+      for (let i = 0; i < n; i++) particles.push(mkDust());
+      if (t === 'night' || t === 'evening') {
+        for (let i = 0; i < 220; i++) stars.push(mkStar());
+      }
+      break;
+    }
+    case 'cloudy': {
+      const n = Math.round(r(120, 200) * density);
+      for (let i = 0; i < n; i++) particles.push(mkCloudMote());
+      break;
+    }
+    case 'fog': {
+      for (let i = 0; i < 30; i++) particles.push(mkFogBlob());
+      break;
+    }
+    case 'drizzle': {
+      const n = Math.round(r(150, 230) * density);
+      for (let i = 0; i < n; i++) particles.push(mkDrizzle());
+      for (let i = 0; i < 14; i++) particles.push(mkFogBlob());
+      break;
+    }
+    case 'rain': {
+      const nFar  = Math.round(r(140, 200) * density);
+      const nNear = Math.round(r(100, 150) * density);
+      for (let i = 0; i < nFar;  i++) particles.push(mkRain(0));
+      for (let i = 0; i < nNear; i++) particles.push(mkRain(1));
+      break;
+    }
+    case 'snow': {
+      const n = [
+        Math.round(r(80,  120) * density),
+        Math.round(r(50,  75)  * density),
+        Math.round(r(20,  35)  * density),
+      ];
+      for (let i = 0; i < n[0]; i++) particles.push(mkSnow(0));
+      for (let i = 0; i < n[1]; i++) particles.push(mkSnow(1));
+      for (let i = 0; i < n[2]; i++) particles.push(mkSnow(2));
+      break;
+    }
+    case 'storm': {
+      const nFar  = Math.round(r(220, 300) * density);
+      const nNear = Math.round(r(160, 220) * density);
+      for (let i = 0; i < nFar;  i++) particles.push(mkRain(0));
+      for (let i = 0; i < nNear; i++) particles.push(mkRain(1));
+      lightTimer = ri(80, 200);
+      break;
+    }
+  }
+}
+
+// =============================================================
+//  DRAW BACKGROUND
+// =============================================================
+function drawBg() {
+  const [c0, c1, c2] = THEMES[wType] || THEMES.clear;
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0,   c0);
+  g.addColorStop(0.5, c1);
+  g.addColorStop(1,   c2);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+
+  const t = tod();
+  // Dawn/dusk warm blush from horizon
+  if (t === 'dawn' || t === 'dusk') {
+    const warm = ctx.createLinearGradient(0, H * 0.45, 0, H);
+    const rgb = t === 'dawn' ? '165,75,18' : '148,52,8';
+    warm.addColorStop(0, `rgba(${rgb},0)`);
+    warm.addColorStop(0.7, `rgba(${rgb},0.09)`);
+    warm.addColorStop(1,   `rgba(${rgb},0.18)`);
+    ctx.fillStyle = warm;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Night: extra cold deepness
+  if (t === 'night') {
+    ctx.fillStyle = 'rgba(0,0,18,0.12)';
+    ctx.fillRect(0, 0, W, H);
+  }
+}
+
+// =============================================================
+//  DRAW PARTICLES
+// =============================================================
+function drawAll() {
+  // Stars first (background layer)
+  stars.forEach(drawStarPt);
+  // Particles
+  particles.forEach(p => {
+    if (p.t === 'dust')   drawDust(p);
+    if (p.t === 'cmote')  drawCmote(p);
+    if (p.t === 'fog')    drawFogBlob(p);
+    if (p.t === 'rain')   drawRainDrop(p);
+    if (p.t === 'drizzle') drawDrizzleDrop(p);
+    if (p.t === 'snow')   drawSnowflake(p);
+  });
+  // Splash rings
+  splashes.forEach(drawSplash);
+}
+
+function drawDust(p) {
+  ctx.save();
+  ctx.globalAlpha = clamp(p.op, 0, 1);
+  // Core dot
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, p.sz, 0, Math.PI * 2);
+  ctx.fillStyle = `hsl(${p.hue},${p.sat}%,${p.lum}%)`;
+  ctx.fill();
+  // Soft glow halo on larger motes
+  if (p.sz > 1.5) {
+    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.sz * 5);
+    g.addColorStop(0, `hsla(${p.hue},${p.sat}%,${p.lum}%,0.25)`);
+    g.addColorStop(1, `hsla(${p.hue},${p.sat}%,${p.lum}%,0)`);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.sz * 5, 0, Math.PI * 2);
+    ctx.fillStyle = g;
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawStarPt(s) {
+  const twinkle = 0.5 + 0.5 * Math.sin(s.tPh + frame * s.tSpd);
+  ctx.save();
+  ctx.globalAlpha = s.op * twinkle;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, s.sz, 0, Math.PI * 2);
+  ctx.fillStyle = 'hsl(215,30%,92%)';
+  ctx.fill();
+  // Cross-flare on bright stars
+  if (s.sz > 1.2 && twinkle > 0.7) {
+    ctx.globalAlpha = s.op * (twinkle - 0.7) * 0.4;
+    ctx.strokeStyle = 'hsl(220,25%,90%)';
+    ctx.lineWidth = 0.4;
+    const fl = s.sz * 4;
+    ctx.beginPath();
+    ctx.moveTo(s.x - fl, s.y); ctx.lineTo(s.x + fl, s.y);
+    ctx.moveTo(s.x, s.y - fl); ctx.lineTo(s.x, s.y + fl);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawCmote(p) {
+  ctx.save();
+  ctx.globalAlpha = p.op;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, p.sz, 0, Math.PI * 2);
+  ctx.fillStyle = 'hsl(215,12%,62%)';
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawFogBlob(p) {
+  const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+  g.addColorStop(0, `rgba(155,152,148,${p.op})`);
+  g.addColorStop(1, 'rgba(155,152,148,0)');
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawRainDrop(p) {
+  const dx = Math.sin(p.ang) * p.len;
+  const dy = Math.cos(p.ang) * p.len;
+  ctx.save();
+  ctx.globalAlpha = p.op;
+  ctx.strokeStyle = p.layer === 0
+    ? 'rgba(155,180,220,1)'
+    : 'rgba(185,212,242,1)';
+  ctx.lineWidth = p.layer === 0 ? 0.45 : 0.75;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y);
+  ctx.lineTo(p.x + dx, p.y + dy);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawDrizzleDrop(p) {
+  const dx = Math.sin(p.ang) * p.len;
+  const dy = Math.cos(p.ang) * p.len;
+  ctx.save();
+  ctx.globalAlpha = p.op;
+  ctx.strokeStyle = 'rgba(150,172,210,1)';
+  ctx.lineWidth = 0.35;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y);
+  ctx.lineTo(p.x + dx, p.y + dy);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawSnowflake(p) {
+  ctx.save();
+  ctx.globalAlpha = clamp(p.op, 0, 1);
+  if (p.isCrystal) {
+    // Six-armed crystal
+    ctx.strokeStyle = 'rgba(205,220,248,1)';
+    ctx.lineWidth = 0.65;
+    ctx.lineCap = 'round';
+    ctx.translate(p.x, p.y);
+    for (let arm = 0; arm < 6; arm++) {
+      ctx.save();
+      ctx.rotate(arm * Math.PI / 3);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(p.sz, 0);
+      // Barbs
+      const b1 = p.sz * 0.42;
+      const b2 = p.sz * 0.68;
+      ctx.moveTo(b1, 0); ctx.lineTo(b1,  p.sz * 0.28);
+      ctx.moveTo(b1, 0); ctx.lineTo(b1, -p.sz * 0.28);
+      ctx.moveTo(b2, 0); ctx.lineTo(b2,  p.sz * 0.2);
+      ctx.moveTo(b2, 0); ctx.lineTo(b2, -p.sz * 0.2);
+      ctx.stroke();
+      ctx.restore();
+    }
+  } else {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.sz, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(208,222,248,1)';
+    ctx.fill();
+    // Soft glow on mid/large flakes
+    if (p.sz > 2) {
+      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.sz * 3.5);
+      g.addColorStop(0, 'rgba(210,225,255,0.2)');
+      g.addColorStop(1, 'rgba(210,225,255,0)');
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.sz * 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = g;
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+function drawSplash(s) {
+  ctx.save();
+  ctx.globalAlpha = clamp(s.op, 0, 1);
+  ctx.strokeStyle = 'rgba(155,198,240,1)';
+  ctx.lineWidth = 0.45;
+  ctx.beginPath();
+  ctx.ellipse(s.x, s.y, s.rr, s.rr * 0.28, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+// =============================================================
+//  ATMOSPHERIC EFFECTS
+// =============================================================
+function drawAtmo() {
+  const t = tod();
+
+  // Clear: warm horizon shimmer + slow moving light sweep
+  if (wType === 'clear') {
+    const sweep = H - ((frame * 0.28) % H);
+    const sg = ctx.createLinearGradient(0, sweep - 90, 0, sweep + 90);
+    sg.addColorStop(0,   'rgba(175,145,85,0)');
+    sg.addColorStop(0.5, 'rgba(175,145,85,0.018)');
+    sg.addColorStop(1,   'rgba(175,145,85,0)');
+    ctx.fillStyle = sg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Central atmospheric haze — bottom
+    const haze = ctx.createRadialGradient(W/2, H, 0, W/2, H, W * 0.85);
+    const warmth = (t === 'dawn' || t === 'dusk') ? 0.07 : 0.03;
+    haze.addColorStop(0, `rgba(200,145,55,${warmth})`);
+    haze.addColorStop(1, 'rgba(200,145,55,0)');
+    ctx.fillStyle = haze;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Rain/storm: cold mist layer at ground
+  if (wType === 'rain' || wType === 'storm' || wType === 'drizzle') {
+    const mist = ctx.createLinearGradient(0, H * 0.72, 0, H);
+    mist.addColorStop(0, 'rgba(90,120,165,0)');
+    mist.addColorStop(1, 'rgba(90,120,165,0.08)');
+    ctx.fillStyle = mist;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Snow: cool blue shimmer at base
+  if (wType === 'snow') {
+    const sg = ctx.createLinearGradient(0, H * 0.78, 0, H);
+    sg.addColorStop(0, 'rgba(170,195,240,0)');
+    sg.addColorStop(1, 'rgba(170,195,240,0.05)');
+    ctx.fillStyle = sg;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Fog: slowly shifting density bands
+  if (wType === 'fog') {
+    const band = Math.sin(frame * 0.002) * 0.1;
+    const fg = ctx.createLinearGradient(0, H * (0.3 + band), 0, H * (0.6 + band));
+    fg.addColorStop(0, 'rgba(145,142,138,0)');
+    fg.addColorStop(0.5, 'rgba(145,142,138,0.035)');
+    fg.addColorStop(1, 'rgba(145,142,138,0)');
+    ctx.fillStyle = fg;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Lightning
+  if (flashVal > 0) {
+    ctx.fillStyle = `rgba(238,238,220,${flashVal * 0.2})`;
+    ctx.fillRect(0, 0, W, H);
+
+    // Draw bolt when flash is still strong
+    if (boltPts && flashVal > 0.45) {
+      ctx.save();
+      ctx.globalAlpha = (flashVal - 0.45) / 0.55;
+      ctx.strokeStyle = 'rgba(255,255,248,1)';
+      ctx.lineWidth = 1.5;
+      ctx.shadowBlur = 22;
+      ctx.shadowColor = 'rgba(180,210,255,0.85)';
+      ctx.beginPath();
+      ctx.moveTo(boltPts[0].x, boltPts[0].y);
+      for (let i = 1; i < boltPts.length; i++) {
+        ctx.lineTo(boltPts[i].x, boltPts[i].y);
+      }
+      ctx.stroke();
+      // Thin bright inner core
+      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = 'rgba(255,255,255,1)';
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+}
+
+function genBolt() {
+  const sx = r(W * 0.15, W * 0.85);
+  const pts = [{ x: sx, y: 0 }];
+  let cx = sx, cy = 0;
+  while (cy < H * 0.88) {
+    cx += r(-55, 55);
+    cy += r(38, 95);
+    pts.push({ x: clamp(cx, 50, W - 50), y: cy });
+  }
+  return pts;
+}
+
+// =============================================================
+//  UPDATE PARTICLES
+// =============================================================
+function updateParticles() {
+  const windX = windMph * 0.015;
+
+  for (const p of particles) {
+    switch (p.t) {
+      case 'dust':
+        p.x += p.vx + Math.sin(frame * p.drift + p.ph) * 0.35;
+        p.y += p.vy;
+        // Breathe opacity
+        if (p.op < p.opT) p.op += p.opSpd;
+        else               p.op -= p.opSpd;
+        if (Math.abs(p.op - p.opT) < 0.025) p.opT = r(0.05, 0.8);
+        // Wrap
+        if (p.y < -8) { p.y = H + 4; p.x = r(0, W); }
+        if (p.x > W + 8) p.x = -4;
+        if (p.x < -8)    p.x = W + 4;
+        break;
+
+      case 'cmote':
+        p.x += p.vx; p.y += p.vy;
+        if (p.x > W + 70) p.x = -70;
+        if (p.x < -70)    p.x = W + 70;
+        if (p.y < -4)     p.y = H + 4;
+        if (p.y > H + 4)  p.y = -4;
+        break;
+
+      case 'fog':
+        p.x += p.vx;
+        if (p.x > W + p.radius + 150) p.x = -p.radius - 150;
+        if (p.x < -p.radius - 150)    p.x =  W + p.radius + 150;
+        break;
+
+      case 'rain': {
+        const spd = p.spd * (1 + windMph / 50);
+        p.x += Math.sin(p.ang) * spd;
+        p.y += Math.cos(p.ang) * spd;
+        if (p.y > H + p.len) {
+          if (p.layer === 1 && Math.random() < 0.28)
+            splashes.push(mkSplash(p.x, H - r(1,6)));
+          p.y = r(-H * 0.4, -5);
+          p.x = r(-W * 0.3, W * 1.3);
+        }
+        break;
+      }
+
+      case 'drizzle': {
+        const spd = p.spd * (1 + windMph / 70);
+        p.x += Math.sin(p.ang) * spd;
+        p.y += Math.cos(p.ang) * spd;
+        if (p.y > H + p.len) {
+          if (Math.random() < 0.12)
+            splashes.push(mkSplash(p.x, H - r(1,5)));
+          p.y = r(-H * 0.3, -4);
+          p.x = r(-W * 0.15, W * 1.15);
+        }
+        break;
+      }
+
+      case 'snow': {
+        p.x += Math.sin(p.driftPh + frame * p.driftSpd) * p.driftAmp + windX;
+        p.y += p.vy;
+        p.driftPh += p.driftSpd * 0.5;
+        if (p.y > H + 10) { p.y = r(-35, -5); p.x = r(0, W); }
+        if (p.x > W + 25) p.x = -20;
+        if (p.x < -25)    p.x = W + 20;
+        break;
+      }
+    }
+  }
+
+  // Splashes
+  for (let i = splashes.length - 1; i >= 0; i--) {
+    const s = splashes[i];
+    s.rr  += s.spd;
+    s.op  -= 0.022;
+    if (s.rr > s.maxR || s.op <= 0) splashes.splice(i, 1);
+  }
+
+  // Lightning
+  if (wType === 'storm') {
+    if (flashVal > 0) {
+      flashVal -= 0.038;
+      if (flashVal < 0) { flashVal = 0; boltPts = null; }
+    }
+    if (--lightTimer <= 0) {
+      flashVal  = r(0.65, 1.0);
+      boltPts   = genBolt();
+      lightTimer = ri(80, 380);
+    }
+  }
+}
+
+// =============================================================
+//  ANIMATION LOOP
+// =============================================================
+function loop() {
+  frame++;
+  ctx.clearRect(0, 0, W, H);
+  drawBg();
+  updateParticles();
+  drawAtmo();
+  drawAll();
+  requestAnimationFrame(loop);
+}
+
+// =============================================================
+//  CLOCK
+// =============================================================
+function updateClock() {
+  const n = new Date();
+  const h = n.getHours(), mi = n.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hh = (h % 12 || 12).toString().padStart(2, ' ');
+  document.getElementById('ovTime').textContent =
+    `${hh}:${mi.toString().padStart(2,'0')} ${ampm}`;
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
+// =============================================================
+//  API HELPERS
+// =============================================================
+function setLoadMsg(m) {
+  document.getElementById('loadMsg').textContent = m;
+}
+
+function hideLoading() {
+  const el = document.getElementById('loading');
+  el.classList.add('fade');
+  setTimeout(() => { el.style.display = 'none'; }, 1400);
+}
+
+function showErr() {
+  document.getElementById('errEl').classList.add('on');
+  hideLoading();
+}
+
+async function geoLocate() {
+  return new Promise(res => {
+    if (!navigator.geolocation) { res(null); return; }
+    navigator.geolocation.getCurrentPosition(
+      p => res({ lat: p.coords.latitude, lon: p.coords.longitude }),
+      () => res(null),
+      { timeout: 7000 }
+    );
+  });
+}
+
+async function ipLocate() {
+  try {
+    const d = await (await fetch('https://ipapi.co/json/')).json();
+    return { lat: d.latitude, lon: d.longitude, city: d.city, country: d.country_name };
+  } catch { return null; }
+}
+
+async function reverseGeo(lat, lon) {
+  try {
+    const d = await (await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+      { headers: { 'Accept-Language': 'en' } }
+    )).json();
+    const a = d.address || {};
+    const city    = a.city || a.town || a.village || a.county || '';
+    const region  = a.state || a.country_code?.toUpperCase() || '';
+    return city ? `${city}${region ? ', ' + region : ''}` : region;
+  } catch { return ''; }
+}
+
+async function fetchWeather(lat, lon) {
+  const url = [
+    'https://api.open-meteo.com/v1/forecast',
+    `?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}`,
+    '&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation',
+    '&daily=temperature_2m_max,temperature_2m_min',
+    '&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&forecast_days=1'
+  ].join('');
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('weather fetch failed');
+  return res.json();
+}
+
+function applyWeather(data, cityStr) {
+  const c   = data.current;
+  const d   = data.daily;
+  const code = c.weather_code;
+
+  wType   = codeToType(code);
+  windMph = c.wind_speed_10m || 0;
+
+  initScene();
+
+  // Overlay
+  document.getElementById('ovTemp').innerHTML =
+    `${Math.round(c.temperature_2m)}<span class="ov-unit">°</span>`;
+  document.getElementById('ovCond').textContent  = WMO[code] || 'Unknown';
+  document.getElementById('ovFeels').textContent = `Feels like ${Math.round(c.apparent_temperature)}°`;
+  document.getElementById('ovCity').textContent  = cityStr || 'Unknown location';
+  if (d?.temperature_2m_max?.[0] != null)
+    document.getElementById('ovHilo').textContent =
+      `H: ${Math.round(d.temperature_2m_max[0])}°  ·  L: ${Math.round(d.temperature_2m_min[0])}°`;
+  document.getElementById('ovWind').textContent =
+    `Wind ${Math.round(windMph)} mph`;
+  document.getElementById('ovUpdated').textContent =
+    `Updated ${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`;
+}
+
+// =============================================================
+//  BOOT
+// =============================================================
+async function boot() {
+  // Start canvas immediately so loading screen has art behind it
+  resize();
+  loop();
+
+  setLoadMsg('Locating you');
+
+  let lat, lon, cityStr = '';
+
+  const geo = await geoLocate();
+  if (geo) {
+    ({ lat, lon } = geo);
+    setLoadMsg('Resolving location');
+    cityStr = await reverseGeo(lat, lon);
+  } else {
+    setLoadMsg('Using IP location');
+    const ip = await ipLocate();
+    if (!ip) { showErr(); return; }
+    ({ lat, lon } = ip);
+    cityStr = ip.city ? `${ip.city}, ${ip.country}` : '';
+  }
+
+  document.getElementById('ovCoords').textContent =
+    `${lat.toFixed(3)}°, ${lon.toFixed(3)}°`;
+
+  setLoadMsg('Reading the sky');
+
+  let data;
+  try { data = await fetchWeather(lat, lon); }
+  catch { showErr(); return; }
+
+  applyWeather(data, cityStr);
+  hideLoading();
+
+  // Refresh every 10 minutes
+  setInterval(async () => {
+    try {
+      applyWeather(await fetchWeather(lat, lon), cityStr);
+    } catch {}
+  }, 10 * 60 * 1000);
+}
+
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "rules": [
+    "50/10 rule: 50 minutes practicing, 10 minutes rest — your hands will thank you.",
+    "Practice rooms are first-come, first-serve. Once you have one, stay in it.",
+    "9:00 pm check-in every night — phones with you.",
+    "Sign in and out at the front desk whenever you leave the building.",
+    "Buddy system after dinner — never walk campus alone.",
+    "Return your meal card at the end of the program."
+  ],
+  "contacts": [
+    { "label": "CA on duty (24/7)", "value": "(555) 010-2026" },
+    { "label": "Program office", "value": "(555) 010-1834" },
+    { "label": "Health services", "value": "(555) 010-4111" }
+  ],
+  "links": [
+    { "label": "Campus map", "url": "#" },
+    { "label": "Final concert livestream", "url": "#" },
+    { "label": "Bowed orchestra parts (PDF)", "url": "#" },
+    { "label": "Instagram", "url": "#" },
+    { "label": "Program website", "url": "#" }
+  ],
+  "lostFound": [
+    { "item": "Black dress shoes (size 9)", "where": "Outside Studio B", "status": "unclaimed" },
+    { "item": "Blue chamber-parts folder", "where": "Concert Hall, row C", "status": "claimed" },
+    { "item": "USB-C charger", "where": "Room 114", "status": "unclaimed" }
+  ]
+}

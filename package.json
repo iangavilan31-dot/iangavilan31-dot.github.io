@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --port 5140 --strictPort",
     "build": "vite build",
-    "preview": "vite preview --port 5140 --strictPort"
+    "preview": "vite preview --port 5140 --strictPort",
+    "check": "node check.mjs"
   },
   "devDependencies": {
     "vite": "^7.1.5"

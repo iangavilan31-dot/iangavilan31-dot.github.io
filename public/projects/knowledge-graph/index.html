@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knowledge Graph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: #03030a;
+  color: #ddd8cc;
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+  width: 100vw; height: 100vh;
+  user-select: none;
+}
+
+canvas { position: fixed; inset: 0; display: block; }
+
+/* ---- DROP ZONE ---- */
+#dropZone {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 1.5rem; z-index: 50;
+  background: #03030a;
+  transition: opacity 0.8s;
+}
+#dropZone.fading { opacity: 0; pointer-events: none; }
+#dropZone.gone   { display: none; }
+
+.dz-eyebrow {
+  font-size: 0.6rem; letter-spacing: 0.26em;
+  text-transform: uppercase; color: #28283a;
+}
+.dz-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  color: #e4dfd5; text-align: center; line-height: 1.15;
+}
+.dz-title em { color: #9a7dff; font-style: italic; }
+.dz-sub {
+  font-weight: 200; font-size: 0.82rem; color: #32323e;
+  max-width: 340px; text-align: center; line-height: 1.7;
+}
+
+.drop-box {
+  border: 1px dashed #1e1e2e;
+  border-radius: 8px;
+  width: 340px; height: 180px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.8rem;
+  transition: border-color 0.3s, background 0.3s;
+  cursor: pointer;
+  position: relative;
+}
+.drop-box:hover, .drop-box.drag-over {
+  border-color: #4a3aaa;
+  background: rgba(74,58,170,0.04);
+}
+.drop-box-icon { font-size: 1.8rem; opacity: 0.3; }
+.drop-box-text {
+  font-size: 0.72rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #2e2e40;
+}
+.drop-box-sub { font-size: 0.65rem; color: #22223a; }
+#folderInput { display: none; }
+
+.or-row {
+  display: flex; align-items: center; gap: 1rem;
+  width: 340px;
+}
+.or-line { flex: 1; height: 1px; background: #141420; }
+.or-text  { font-size: 0.62rem; color: #202030; letter-spacing: 0.1em; }
+
+.btn-pick {
+  border: 1px solid #2a2a40;
+  background: transparent; border-radius: 3px;
+  color: #5a5a7a; font-family: 'Inter', sans-serif;
+  font-size: 0.68rem; letter-spacing: 0.18em;
+  text-transform: uppercase; padding: 0.7rem 2rem;
+  cursor: pointer; transition: all 0.25s;
+}
+.btn-pick:hover { border-color: #9a7dff; color: #9a7dff; }
+
+/* ---- LOADING ---- */
+#loadingBar {
+  position: fixed; inset: 0; z-index: 40;
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1.5rem;
+}
+#loadingBar.on { display: flex; }
+.ld-title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 1.2rem;
+  color: rgba(154,125,255,0.5);
+}
+.ld-track {
+  width: 280px; height: 1px; background: #0e0e1a;
+  position: relative; overflow: visible;
+}
+.ld-fill {
+  height: 1px; background: linear-gradient(90deg, #4a3aaa, #9a7dff);
+  width: 0%; transition: width 0.3s ease;
+  position: relative;
+}
+.ld-fill::after {
+  content: ''; position: absolute; right: -3px; top: -3px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #9a7dff;
+  box-shadow: 0 0 10px #9a7dff88;
+}
+.ld-msg {
+  font-weight: 200; font-size: 0.65rem;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: #222235;
+}
+
+/* ---- OVERLAY UI ---- */
+#ui {
+  position: fixed; inset: 0; z-index: 10;
+  pointer-events: none;
+  display: none;
+}
+#ui.on { display: block; }
+
+/* Stats top-left */
+#stats {
+  position: absolute; top: 1.5rem; left: 1.8rem;
+  display: flex; flex-direction: column; gap: 0.2rem;
+}
+.stat-row {
+  font-size: 0.62rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #22223a;
+}
+.stat-row span { color: #9a7dff; }
+
+/* Search top-center */
+#searchWrap {
+  position: absolute; top: 1.4rem;
+  left: 50%; transform: translateX(-50%);
+  pointer-events: all;
+}
+#searchInput {
+  background: rgba(5,5,15,0.85);
+  border: 1px solid #1a1a2a;
+  border-radius: 3px;
+  color: #ccc8be;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 1rem;
+  outline: none;
+  width: 220px;
+  transition: border-color 0.25s, width 0.3s;
+  text-align: center;
+}
+#searchInput:focus {
+  border-color: #3a2a7a;
+  width: 280px;
+}
+#searchInput::placeholder { color: #1e1e30; }
+
+/* Reset button top-right */
+#btnReset {
+  position: absolute; top: 1.5rem; right: 1.8rem;
+  background: transparent; border: 1px solid #1a1a2a;
+  border-radius: 3px; color: #22223a;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.6rem; letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.55rem 1rem; cursor: pointer;
+  pointer-events: all; transition: all 0.25s;
+}
+#btnReset:hover { border-color: #3a2a5a; color: #6a5aaa; }
+
+/* Hover label */
+#hoverLabel {
+  position: absolute; pointer-events: none;
+  display: none;
+  background: rgba(5,5,15,0.9);
+  border: 1px solid #1a1a2e;
+  border-radius: 4px;
+  padding: 0.55rem 0.9rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.9);
+  max-width: 240px;
+}
+#hoverLabel.show { display: block; }
+.hl-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.85rem; color: #e4dfd5;
+  margin-bottom: 0.2rem; line-height: 1.35;
+}
+.hl-meta { font-size: 0.6rem; color: #333346; letter-spacing: 0.08em; }
+.hl-tags { font-size: 0.6rem; color: #5a4a8a; margin-top: 0.2rem; }
+
+/* Info panel (right side) */
+#infoPanel {
+  position: absolute; top: 0; right: -360px;
+  width: 340px; height: 100vh;
+  background: rgba(5,5,14,0.95);
+  border-left: 1px solid #10101e;
+  padding: 5rem 1.8rem 2rem;
+  overflow-y: auto;
+  pointer-events: all;
+  transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
+  display: flex; flex-direction: column; gap: 1.4rem;
+}
+#infoPanel.open { right: 0; }
+
+.ip-close {
+  position: absolute; top: 1.5rem; right: 1.5rem;
+  background: none; border: none; color: #2a2a3a;
+  font-size: 1rem; cursor: pointer;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; transition: color 0.2s, background 0.2s;
+}
+.ip-close:hover { color: #aaa; background: #111120; }
+
+.ip-folder {
+  font-size: 0.6rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: #3a3a50;
+}
+.ip-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem; color: #e4dfd5; line-height: 1.3;
+}
+.ip-degree { font-size: 0.68rem; color: #3a3a50; }
+.ip-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.ip-tag {
+  font-size: 0.6rem; letter-spacing: 0.08em;
+  color: #7a6abb; border: 1px solid #2a2040;
+  padding: 0.2rem 0.5rem; border-radius: 2px;
+}
+.ip-section-title {
+  font-size: 0.6rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: #2a2a3a;
+  margin-bottom: 0.5rem;
+}
+.ip-links { display: flex; flex-direction: column; gap: 0.3rem; }
+.ip-link {
+  font-size: 0.75rem; color: #5a5a7a;
+  cursor: pointer; padding: 0.3rem 0;
+  border-bottom: 1px solid #0e0e18;
+  transition: color 0.2s;
+}
+.ip-link:hover { color: #9a7dff; }
+
+/* Auto-rotate hint */
+#hint {
+  position: absolute; bottom: 1.5rem; left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.58rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #14142a;
+  transition: opacity 0.5s;
+}
+</style>
+</head>
+<body>
+
+<!-- DROP ZONE -->
+<div id="dropZone">
+  <div class="dz-eyebrow">Obsidian Knowledge Graph</div>
+  <h1 class="dz-title">Your mind,<br><em>in 3D space</em></h1>
+  <p class="dz-sub">Drop your Obsidian vault folder here. Every note becomes a node. Every [[link]] draws an edge.</p>
+  <div class="drop-box" id="dropBox">
+    <div class="drop-box-icon">⬡</div>
+    <div class="drop-box-text">Drop vault folder here</div>
+    <div class="drop-box-sub">or use the button below</div>
+  </div>
+  <div class="or-row"><div class="or-line"></div><div class="or-text">or</div><div class="or-line"></div></div>
+  <button class="btn-pick" id="btnPick">Browse for vault folder</button>
+  <input type="file" id="folderInput" webkitdirectory multiple accept=".md">
+</div>
+
+<!-- LOADING -->
+<div id="loadingBar">
+  <div class="ld-title">Building your graph</div>
+  <div class="ld-track"><div class="ld-fill" id="ldFill"></div></div>
+  <div class="ld-msg" id="ldMsg">Reading files</div>
+</div>
+
+<!-- CANVAS -->
+<canvas id="c"></canvas>
+
+<!-- UI OVERLAY -->
+<div id="ui">
+  <div id="stats">
+    <div class="stat-row"><span id="sNodes">0</span> notes</div>
+    <div class="stat-row"><span id="sEdges">0</span> connections</div>
+    <div class="stat-row"><span id="sFolders">0</span> folders</div>
+  </div>
+
+  <div id="searchWrap">
+    <input id="searchInput" type="text" placeholder="Search notes…" autocomplete="off" spellcheck="false">
+  </div>
+
+  <button id="btnReset">New vault</button>
+
+  <div id="hoverLabel">
+    <div class="hl-name" id="hlName"></div>
+    <div class="hl-meta" id="hlMeta"></div>
+    <div class="hl-tags" id="hlTags"></div>
+  </div>
+
+  <div id="infoPanel">
+    <button class="ip-close" id="ipClose">✕</button>
+    <div class="ip-folder" id="ipFolder"></div>
+    <div class="ip-title"  id="ipTitle"></div>
+    <div class="ip-degree" id="ipDegree"></div>
+    <div class="ip-tags"   id="ipTagsWrap"></div>
+    <div>
+      <div class="ip-section-title">Connected notes</div>
+      <div class="ip-links" id="ipLinks"></div>
+    </div>
+  </div>
+
+  <div id="hint">Drag to orbit · Scroll to zoom · Click a node</div>
+</div>
+
+<!-- Pre-loaded vault data (generated by PowerShell scan) -->
+<script src="vault-data.js"></script>
+<!-- D3 for force simulation -->
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// =============================================================
+//  GLOBALS
+// =============================================================
+let scene, camera, renderer, controls;
+let nodePoints, edgeLines, glowPoints;
+let highlightEdges;
+let nodes = [], edges = [], folders = [];
+let hoveredIdx = -1, selectedIdx = -1;
+let searchIdx   = -1;
+let W = window.innerWidth, H = window.innerHeight;
+const mouse = new THREE.Vector2(-9999, -9999);
+
+// Three.js objects refs for updates
+let posAttr, colorAttr, sizeAttr;
+let glowColorAttr, glowSizeAttr;
+let edgePosAttr;
+let highlightPosAttr;
+
+const BASE_NODE_COLOR   = new THREE.Color('#c8c2ea');
+const HIGHLIGHT_COLOR   = new THREE.Color('#ffffff');
+const DIM_COLOR         = new THREE.Color('#0e0e20');
+const SEARCH_COLOR      = new THREE.Color('#ffea70');
+const EDGE_COLOR        = new THREE.Color(0x2a2a5a);
+const HIT_EDGE_COLOR    = new THREE.Color(0x7a6aff);
+
+// =============================================================
+//  FILE READING
+// =============================================================
+const dropZone  = document.getElementById('dropZone');
+const dropBox   = document.getElementById('dropBox');
+const folderIn  = document.getElementById('folderInput');
+const btnPick   = document.getElementById('btnPick');
+
+btnPick.addEventListener('click', () => folderIn.click());
+folderIn.addEventListener('change', () => handleFileList(folderIn.files));
+
+dropBox.addEventListener('dragover', e => { e.preventDefault(); dropBox.classList.add('drag-over'); });
+dropBox.addEventListener('dragleave', () => dropBox.classList.remove('drag-over'));
+dropBox.addEventListener('drop', async e => {
+  e.preventDefault();
+  dropBox.classList.remove('drag-over');
+  const items = e.dataTransfer.items;
+  if (!items) return;
+  const allFiles = [];
+  const reads = [];
+  for (const item of items) {
+    const entry = item.webkitGetAsEntry?.();
+    if (entry) reads.push(readEntry(entry, allFiles));
+  }
+  await Promise.all(reads);
+  handleFileList(allFiles);
+});
+
+async function readEntry(entry, out) {
+  if (entry.isFile && entry.name.endsWith('.md')) {
+    const file = await new Promise(r => entry.file(r));
+    file._fullPath = entry.fullPath;
+    out.push(file);
+  } else if (entry.isDirectory) {
+    const reader = entry.createReader();
+    let batch;
+    do {
+      batch = await new Promise(r => reader.readEntries(r));
+      for (const e of batch) await readEntry(e, out);
+    } while (batch.length > 0);
+  }
+}
+
+// =============================================================
+//  PARSING
+// =============================================================
+function setLoad(pct, msg) {
+  document.getElementById('ldFill').style.width = pct + '%';
+  document.getElementById('ldMsg').textContent  = msg;
+}
+
+async function handleFileList(fileList) {
+  const files = Array.from(fileList).filter(f => f.name.endsWith('.md'));
+  if (!files.length) return;
+
+  // Fade out drop zone
+  dropZone.classList.add('fading');
+  setTimeout(() => dropZone.classList.add('gone'), 900);
+
+  const lb = document.getElementById('loadingBar');
+  lb.classList.add('on');
+
+  setLoad(5, `Found ${files.length} notes — reading…`);
+  await delay(20);
+
+  // Parse files in chunks
+  const parsed = [];
+  const chunkSize = 80;
+  for (let i = 0; i < files.length; i += chunkSize) {
+    const chunk = files.slice(i, i + chunkSize);
+    for (const f of chunk) parsed.push(await parseFile(f));
+    setLoad(5 + 40 * ((i + chunkSize) / files.length), 'Parsing markdown');
+    await delay(1);
+  }
+
+  setLoad(50, 'Building graph');
+  await delay(20);
+  const graph = buildGraph(parsed);
+
+  setLoad(60, `${graph.nodes.length} nodes, ${graph.edges.length} edges — simulating…`);
+  await delay(20);
+
+  await runLayout(graph);
+
+  setLoad(90, 'Rendering');
+  await delay(20);
+
+  nodes  = graph.nodes;
+  edges  = graph.edges;
+  folders = [...new Set(nodes.map(n => n.folder))];
+
+  initThree();
+  buildScene();
+
+  lb.classList.remove('on');
+  document.getElementById('ui').classList.add('on');
+  document.getElementById('sNodes').textContent   = nodes.length.toLocaleString();
+  document.getElementById('sEdges').textContent   = edges.length.toLocaleString();
+  document.getElementById('sFolders').textContent = folders.length.toLocaleString();
+
+  setLoad(100, 'Done');
+}
+
+async function parseFile(file) {
+  const text     = await file.text();
+  const rawPath  = file._fullPath || file.webkitRelativePath || file.name;
+
+  // Strip vault root (first path segment) from webkitRelativePath
+  let notePath = rawPath.replace(/^\//, '');
+  const parts  = notePath.split('/');
+  if (parts.length > 1 && file.webkitRelativePath) parts.shift(); // remove vault root
+  notePath = parts.join('/').replace(/\.md$/, '');
+
+  const folder = parts.length > 1 ? parts[0] : '_root';
+
+  // [[wikilinks]] — handle [[link|alias]], [[link#heading]]
+  const links = [];
+  const linkRe = /\[\[([^\]|#\n]+?)(?:[|#][^\]\n]*)?\]\]/g;
+  let m;
+  while ((m = linkRe.exec(text)) !== null) {
+    const lnk = m[1].trim();
+    if (lnk) links.push(lnk);
+  }
+
+  // #tags (not inside code blocks, not inside wikilinks)
+  const tags = [];
+  const tagRe = /(?:^|\s)#([a-zA-Z][a-zA-Z0-9_\-/]*)/gm;
+  while ((m = tagRe.exec(text)) !== null) tags.push(m[1]);
+
+  // Short preview
+  const preview = text.replace(/^---[\s\S]*?---\n?/, '').replace(/#+\s/g, '').trim().slice(0, 200);
+
+  return { notePath, folder, links, tags, preview };
+}
+
+// =============================================================
+//  GRAPH BUILDING
+// =============================================================
+function buildGraph(parsed) {
+  const nodeMap = new Map();
+
+  for (const p of parsed) {
+    const key = p.notePath.toLowerCase();
+    nodeMap.set(key, {
+      id: p.notePath,
+      displayName: p.notePath.split('/').pop(),
+      folder: p.folder,
+      tags: p.tags,
+      links: p.links,
+      preview: p.preview,
+      degree: 0,
+      external: false,
+    });
+  }
+
+  const rawEdges = [];
+  for (const p of parsed) {
+    const srcKey = p.notePath.toLowerCase();
+    for (const lnk of p.links) {
+      // Match by filename or full path
+      const lnkKey = lnk.toLowerCase();
+      // Try exact key first, then suffix match
+      let tgtKey = null;
+      if (nodeMap.has(lnkKey)) {
+        tgtKey = lnkKey;
+      } else {
+        // Search for a note whose path ends with lnkKey or lnkKey+'.md'
+        for (const k of nodeMap.keys()) {
+          if (k === lnkKey || k.endsWith('/' + lnkKey)) { tgtKey = k; break; }
+        }
+      }
+      if (!tgtKey) {
+        // Create stub external node
+        tgtKey = lnkKey;
+        nodeMap.set(tgtKey, {
+          id: lnk, displayName: lnk.split('/').pop(),
+          folder: '_external', tags: [], links: [],
+          preview: '', degree: 0, external: true,
+        });
+      }
+      if (srcKey !== tgtKey) rawEdges.push({ source: srcKey, target: tgtKey });
+    }
+  }
+
+  // Deduplicate edges
+  const seen = new Set();
+  const edges = [];
+  for (const e of rawEdges) {
+    const k = [e.source, e.target].sort().join('|||');
+    if (!seen.has(k)) { seen.add(k); edges.push({ ...e }); }
+  }
+
+  // Degree count
+  for (const e of edges) {
+    const src = nodeMap.get(e.source);
+    const tgt = nodeMap.get(e.target);
+    if (src) src.degree++;
+    if (tgt) tgt.degree++;
+  }
+
+  const nodeArr = Array.from(nodeMap.values());
+  // Assign index
+  nodeArr.forEach((n, i) => n.idx = i);
+  // Build adjacency for panel use
+  for (const n of nodeArr) n.neighbors = [];
+  for (const e of edges) {
+    const s = nodeMap.get(e.source);
+    const t = nodeMap.get(e.target);
+    if (s && t) { s.neighbors.push(t.idx); t.neighbors.push(s.idx); }
+  }
+
+  return { nodes: nodeArr, edges, nodeMap };
+}
+
+// =============================================================
+//  D3 FORCE LAYOUT (3D: 2D sim + Z spread)
+// =============================================================
+async function runLayout({ nodes, edges }) {
+  return new Promise(resolve => {
+    const simNodes = nodes.map(n => ({ idx: n.idx }));
+    const simEdges = edges.map(e => ({ source: e.source, target: e.target }));
+
+    // We run 2D sim
+    const sim = d3.forceSimulation(simNodes)
+      .force('link', d3.forceLink(simEdges)
+        .id(n => nodes[n.idx].id.toLowerCase())
+        .distance(d => 30 + 15 / Math.max(1, (nodes[d.source.idx]?.degree + nodes[d.target.idx]?.degree) / 2))
+        .strength(0.6))
+      .force('charge', d3.forceManyBody()
+        .strength(n => -50 - nodes[n.idx].degree * 3)
+        .theta(0.9))
+      .force('center', d3.forceCenter(0, 0))
+      .force('collision', d3.forceCollide(6))
+      .stop();
+
+    const iters = Math.min(350, Math.max(180, Math.floor(10000 / Math.max(nodes.length, 1))));
+    for (let i = 0; i < iters; i++) sim.tick();
+
+    // Transfer positions + add Z (spread by cluster via degree-weighted)
+    let maxR = 0;
+    for (const sn of simNodes) {
+      maxR = Math.max(maxR, Math.sqrt(sn.x * sn.x + sn.y * sn.y));
+    }
+    const scale = 220 / Math.max(maxR, 1);
+
+    for (let i = 0; i < nodes.length; i++) {
+      nodes[i].x = (simNodes[i].x || 0) * scale;
+      nodes[i].y = (simNodes[i].y || 0) * scale;
+      // Z: deterministic spread based on degree and a seeded random
+      const seed = nodes[i].id.split('').reduce((a, c) => a * 31 + c.charCodeAt(0), 0);
+      const zr   = ((seed & 0xffff) / 0xffff - 0.5);
+      nodes[i].z = zr * 120 * (1 - nodes[i].degree / 30); // high-degree nodes closer to z=0
+    }
+
+    resolve();
+  });
+}
+
+// =============================================================
+//  THREE.JS INIT
+// =============================================================
+function initThree() {
+  if (renderer) return; // already inited
+
+  scene    = new THREE.Scene();
+  camera   = new THREE.PerspectiveCamera(55, W / H, 0.1, 3000);
+  camera.position.set(0, 0, 420);
+
+  renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setClearColor(0x03030a, 1);
+  renderer.setSize(W, H);
+
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.055;
+  controls.minDistance = 20;
+  controls.maxDistance = 1200;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.35;
+
+  controls.addEventListener('start', () => {
+    controls.autoRotate = false;
+    document.getElementById('hint').style.opacity = '0';
+  });
+
+  window.addEventListener('resize', () => {
+    W = window.innerWidth; H = window.innerHeight;
+    camera.aspect = W / H; camera.updateProjectionMatrix();
+    renderer.setSize(W, H);
+  });
+
+  renderer.domElement.addEventListener('mousemove', onMouseMove);
+  renderer.domElement.addEventListener('click', onCanvasClick);
+
+  animate();
+}
+
+// =============================================================
+//  COLOR HELPERS
+// =============================================================
+const _folderColorCache = new Map();
+function folderColor(folder) {
+  if (_folderColorCache.has(folder)) return _folderColorCache.get(folder);
+  if (folder === '_root')     { const c = new THREE.Color().setHSL(0.72, 0.6, 0.62); _folderColorCache.set(folder, c); return c; }
+  if (folder === '_external') { const c = new THREE.Color().setHSL(0, 0, 0.28);       _folderColorCache.set(folder, c); return c; }
+  let h = 0;
+  for (const ch of folder) h = (h * 31 + ch.charCodeAt(0)) & 0x7fffffff;
+  const c = new THREE.Color().setHSL((h % 1000) / 1000, 0.68, 0.6);
+  _folderColorCache.set(folder, c);
+  return c;
+}
+
+function nodeBaseColor(n) {
+  return n.external ? new THREE.Color().setHSL(0, 0, 0.22) : folderColor(n.folder);
+}
+
+function nodeSz(n) {
+  return n.external ? 1.2 : Math.max(1.5, Math.min(10, 1.5 + Math.sqrt(n.degree) * 1.6));
+}
+
+// =============================================================
+//  BUILD SCENE
+// =============================================================
+function createGlowTexture() {
+  const sz = 128, c = document.createElement('canvas');
+  c.width = c.height = sz;
+  const cx = c.getContext('2d');
+  const g  = cx.createRadialGradient(64,64,0, 64,64,63);
+  g.addColorStop(0,   'rgba(255,255,255,1)');
+  g.addColorStop(0.12,'rgba(255,255,255,0.95)');
+  g.addColorStop(0.35,'rgba(255,255,255,0.55)');
+  g.addColorStop(0.65,'rgba(255,255,255,0.15)');
+  g.addColorStop(1,   'rgba(255,255,255,0)');
+  cx.fillStyle = g; cx.fillRect(0,0,sz,sz);
+  return new THREE.CanvasTexture(c);
+}
+
+function buildScene() {
+  if (nodePoints) { scene.remove(nodePoints); nodePoints.geometry.dispose(); }
+  if (glowPoints) { scene.remove(glowPoints); glowPoints.geometry.dispose(); }
+  if (edgeLines)  { scene.remove(edgeLines);  edgeLines.geometry.dispose();  }
+  if (highlightEdges) { scene.remove(highlightEdges); highlightEdges.geometry.dispose(); }
+
+  const n    = nodes.length;
+  const glowTex = createGlowTexture();
+
+  // ---- NODE POSITIONS / COLORS / SIZES ----
+  const pos  = new Float32Array(n * 3);
+  const cols = new Float32Array(n * 3);
+  const szs  = new Float32Array(n);
+  const gCols = new Float32Array(n * 3);
+  const gSzs  = new Float32Array(n);
+
+  for (let i = 0; i < n; i++) {
+    const nd = nodes[i];
+    pos[i*3]   = nd.x; pos[i*3+1] = nd.y; pos[i*3+2] = nd.z;
+    const bc   = nodeBaseColor(nd);
+    cols[i*3]  = bc.r; cols[i*3+1] = bc.g; cols[i*3+2] = bc.b;
+    szs[i]     = nodeSz(nd);
+    gCols[i*3] = bc.r * 0.7; gCols[i*3+1] = bc.g * 0.7; gCols[i*3+2] = bc.b * 0.7;
+    gSzs[i]    = szs[i] * 3.2;
+  }
+
+  // ---- NODE SHADER (core dots) ----
+  const nodeGeo = new THREE.BufferGeometry();
+  posAttr   = new THREE.BufferAttribute(pos.slice(),  3);
+  colorAttr = new THREE.BufferAttribute(cols.slice(), 3);
+  sizeAttr  = new THREE.BufferAttribute(szs.slice(),  1);
+  nodeGeo.setAttribute('position', posAttr);
+  nodeGeo.setAttribute('color',    colorAttr);
+  nodeGeo.setAttribute('nodeSize', sizeAttr);
+
+  const nodeMat = new THREE.ShaderMaterial({
+    uniforms: {
+      map:      { value: glowTex },
+      time:     { value: 0 },
+      hoverIdx: { value: -1 },
+      selIdx:   { value: -1 },
+      srchIdx:  { value: -1 },
+    },
+    vertexShader: `
+      attribute vec3 color;
+      attribute float nodeSize;
+      varying vec3 vColor;
+      varying float vIdx;
+      uniform float time;
+      uniform float hoverIdx;
+      uniform float selIdx;
+      uniform float srchIdx;
+
+      float vIndex() {
+        // encode index in gl_VertexID equivalent — we use y of position as proxy, but
+        // actually we pass it through an attribute-free trick using the draw order.
+        return 0.0;
+      }
+
+      void main() {
+        vColor = color;
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        float pulse = 1.0 + 0.06 * sin(time * 1.8 + position.x * 0.04 + position.z * 0.03);
+        gl_PointSize = nodeSize * pulse * (320.0 / -mv.z);
+        gl_Position  = projectionMatrix * mv;
+      }
+    `,
+    fragmentShader: `
+      uniform sampler2D map;
+      varying vec3 vColor;
+      void main() {
+        vec4 t = texture2D(map, gl_PointCoord);
+        if (t.a < 0.01) discard;
+        gl_FragColor = vec4(vColor, 1.0) * vec4(t.rgb + 0.1, t.a);
+      }
+    `,
+    transparent: true, depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    vertexColors: true,
+  });
+
+  nodePoints = new THREE.Points(nodeGeo, nodeMat);
+  scene.add(nodePoints);
+
+  // ---- GLOW LAYER ----
+  const glowGeo = new THREE.BufferGeometry();
+  glowColorAttr = new THREE.BufferAttribute(gCols.slice(), 3);
+  glowSizeAttr  = new THREE.BufferAttribute(gSzs.slice(),  1);
+  glowGeo.setAttribute('position', new THREE.BufferAttribute(pos.slice(), 3));
+  glowGeo.setAttribute('color',    glowColorAttr);
+  glowGeo.setAttribute('nodeSize', glowSizeAttr);
+
+  const glowMat = new THREE.ShaderMaterial({
+    uniforms: { map: { value: glowTex }, time: { value: 0 } },
+    vertexShader: `
+      attribute vec3 color;
+      attribute float nodeSize;
+      varying vec3 vColor;
+      uniform float time;
+      void main() {
+        vColor = color;
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        float pulse = 1.0 + 0.08 * sin(time * 1.4 + position.y * 0.035);
+        gl_PointSize = nodeSize * pulse * (320.0 / -mv.z);
+        gl_Position  = projectionMatrix * mv;
+      }
+    `,
+    fragmentShader: `
+      uniform sampler2D map;
+      varying vec3 vColor;
+      void main() {
+        vec4 t = texture2D(map, gl_PointCoord);
+        if (t.a < 0.005) discard;
+        gl_FragColor = vec4(vColor * t.rgb, t.a * 0.38);
+      }
+    `,
+    transparent: true, depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    vertexColors: true,
+  });
+  glowPoints = new THREE.Points(glowGeo, glowMat);
+  scene.add(glowPoints);
+
+  // ---- EDGES ----
+  const ep  = new Float32Array(edges.length * 6);
+  for (let i = 0; i < edges.length; i++) {
+    const s = edges[i].source, t = edges[i].target;
+    const sn = nodes.find(n => n.id.toLowerCase() === s);
+    const tn = nodes.find(n => n.id.toLowerCase() === t);
+    if (!sn || !tn) continue;
+    ep[i*6]   = sn.x; ep[i*6+1] = sn.y; ep[i*6+2] = sn.z;
+    ep[i*6+3] = tn.x; ep[i*6+4] = tn.y; ep[i*6+5] = tn.z;
+  }
+  const edgeGeo = new THREE.BufferGeometry();
+  edgePosAttr   = new THREE.BufferAttribute(ep, 3);
+  edgeGeo.setAttribute('position', edgePosAttr);
+  const edgeMat = new THREE.LineBasicMaterial({
+    color: 0x2a2a5a, opacity: 0.28, transparent: true,
+  });
+  edgeLines = new THREE.LineSegments(edgeGeo, edgeMat);
+  scene.add(edgeLines);
+
+  // ---- HIGHLIGHT EDGES (reused for hover) ----
+  const hep    = new Float32Array(200 * 6);
+  const hEdgeGeo = new THREE.BufferGeometry();
+  highlightPosAttr = new THREE.BufferAttribute(hep, 3);
+  highlightPosAttr.setUsage(THREE.DynamicDrawUsage);
+  hEdgeGeo.setAttribute('position', highlightPosAttr);
+  hEdgeGeo.setDrawRange(0, 0);
+  const hEdgeMat = new THREE.LineBasicMaterial({
+    color: 0x7a6aff, opacity: 0.7, transparent: true,
+  });
+  highlightEdges = new THREE.LineSegments(hEdgeGeo, hEdgeMat);
+  scene.add(highlightEdges);
+
+  hoveredIdx = -1; selectedIdx = -1;
+}
+
+// =============================================================
+//  NODE LOOKUP
+// =============================================================
+function nodeAtScreen(mx, my) {
+  let best = -1, bestDist = Infinity;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < nodes.length; i++) {
+    v.set(nodes[i].x, nodes[i].y, nodes[i].z);
+    v.project(camera);
+    const sx = (v.x + 1) / 2 * W;
+    const sy = (-v.y + 1) / 2 * H;
+    if (v.z > 1) continue; // behind camera
+    const d = Math.hypot(sx - mx, sy - my);
+    const threshold = Math.max(10, nodeSz(nodes[i]) * 3);
+    if (d < threshold && d < bestDist) { bestDist = d; best = i; }
+  }
+  return best;
+}
+
+// =============================================================
+//  HOVER / CLICK
+// =============================================================
+let mouseX = -9999, mouseY = -9999;
+
+function onMouseMove(e) {
+  mouseX = e.clientX; mouseY = e.clientY;
+}
+
+function onCanvasClick(e) {
+  const idx = nodeAtScreen(e.clientX, e.clientY);
+  if (idx >= 0) openPanel(idx);
+  else closePanel();
+}
+
+function updateHover() {
+  const idx = nodeAtScreen(mouseX, mouseY);
+  if (idx === hoveredIdx) return;
+  hoveredIdx = idx;
+
+  const label = document.getElementById('hoverLabel');
+  if (idx < 0) {
+    label.classList.remove('show');
+    clearHighlightEdges();
+    resetNodeColors();
+    return;
+  }
+
+  const n = nodes[idx];
+  document.getElementById('hlName').textContent = n.displayName;
+  document.getElementById('hlMeta').textContent = `${n.folder} · ${n.degree} connection${n.degree !== 1 ? 's' : ''}`;
+  document.getElementById('hlTags').textContent = n.tags.slice(0, 5).map(t => '#' + t).join('  ');
+  label.classList.add('show');
+
+  // Position label
+  const v = new THREE.Vector3(n.x, n.y, n.z).project(camera);
+  const sx = (v.x + 1) / 2 * W;
+  const sy = (-v.y + 1) / 2 * H;
+  const lx = Math.min(sx + 16, W - 260);
+  const ly = Math.min(sy + 8, H - 120);
+  label.style.left = lx + 'px';
+  label.style.top  = ly + 'px';
+
+  // Highlight neighbor edges
+  showHighlightEdges(idx);
+  dimNonNeighbors(idx);
+}
+
+function showHighlightEdges(idx) {
+  const n   = nodes[idx];
+  const buf = highlightPosAttr.array;
+  let cnt = 0;
+  for (const ni of n.neighbors) {
+    if (cnt >= 200) break;
+    const nb = nodes[ni];
+    buf[cnt*6]   = n.x;  buf[cnt*6+1] = n.y;  buf[cnt*6+2] = n.z;
+    buf[cnt*6+3] = nb.x; buf[cnt*6+4] = nb.y; buf[cnt*6+5] = nb.z;
+    cnt++;
+  }
+  highlightPosAttr.needsUpdate = true;
+  highlightEdges.geometry.setDrawRange(0, cnt * 2);
+}
+
+function clearHighlightEdges() {
+  highlightEdges.geometry.setDrawRange(0, 0);
+}
+
+function dimNonNeighbors(idx) {
+  const n       = nodes[idx];
+  const neighSet = new Set(n.neighbors);
+  neighSet.add(idx);
+  const cols = colorAttr.array;
+  const gcols = glowColorAttr.array;
+  for (let i = 0; i < nodes.length; i++) {
+    const ni = nodes[i];
+    const bc = nodeBaseColor(ni);
+    const dim = !neighSet.has(i);
+    const factor = dim ? 0.12 : 1.0;
+    cols[i*3]   = bc.r * factor;
+    cols[i*3+1] = bc.g * factor;
+    cols[i*3+2] = bc.b * factor;
+    gcols[i*3]   = bc.r * factor * 0.6;
+    gcols[i*3+1] = bc.g * factor * 0.6;
+    gcols[i*3+2] = bc.b * factor * 0.6;
+  }
+  // Boost hovered node
+  cols[idx*3]   = 1; cols[idx*3+1] = 1; cols[idx*3+2] = 1;
+  colorAttr.needsUpdate     = true;
+  glowColorAttr.needsUpdate = true;
+}
+
+function resetNodeColors(force = false) {
+  if (hoveredIdx >= 0 && !force) return;
+  const cols  = colorAttr.array;
+  const gcols = glowColorAttr.array;
+  for (let i = 0; i < nodes.length; i++) {
+    const ni = nodes[i];
+    const isSearch = (i === searchIdx);
+    const bc = isSearch ? SEARCH_COLOR : nodeBaseColor(ni);
+    cols[i*3]   = bc.r; cols[i*3+1] = bc.g; cols[i*3+2] = bc.b;
+    gcols[i*3]  = bc.r * 0.7; gcols[i*3+1] = bc.g * 0.7; gcols[i*3+2] = bc.b * 0.7;
+  }
+  colorAttr.needsUpdate     = true;
+  glowColorAttr.needsUpdate = true;
+}
+
+// =============================================================
+//  INFO PANEL
+// =============================================================
+function openPanel(idx) {
+  selectedIdx = idx;
+  const n = nodes[idx];
+
+  document.getElementById('ipFolder').textContent  = n.folder;
+  document.getElementById('ipTitle').textContent   = n.displayName;
+  document.getElementById('ipDegree').textContent  = `${n.degree} connection${n.degree !== 1 ? 's' : ''}`;
+
+  const tagsEl = document.getElementById('ipTagsWrap');
+  tagsEl.innerHTML = n.tags.slice(0, 8).map(t => `<div class="ip-tag">#${t}</div>`).join('');
+
+  const linksEl = document.getElementById('ipLinks');
+  linksEl.innerHTML = n.neighbors.slice(0, 25).map(ni => {
+    const nb = nodes[ni];
+    return `<div class="ip-link" data-idx="${ni}">${nb.displayName}</div>`;
+  }).join('');
+
+  linksEl.querySelectorAll('.ip-link').forEach(el => {
+    el.addEventListener('click', () => {
+      openPanel(+el.dataset.idx);
+      focusNode(+el.dataset.idx);
+    });
+  });
+
+  document.getElementById('infoPanel').classList.add('open');
+  focusNode(idx);
+}
+
+function closePanel() {
+  selectedIdx = -1;
+  document.getElementById('infoPanel').classList.remove('open');
+}
+
+document.getElementById('ipClose').addEventListener('click', closePanel);
+
+function focusNode(idx) {
+  const n = nodes[idx];
+  const target = new THREE.Vector3(n.x, n.y, n.z);
+  const dist   = camera.position.distanceTo(target);
+  const dir    = camera.position.clone().sub(target).normalize();
+  const newPos = target.clone().add(dir.multiplyScalar(Math.min(dist, 160)));
+
+  // Animate via damped lerp each frame
+  controls.target.set(n.x, n.y, n.z);
+  controls.autoRotate = false;
+}
+
+// =============================================================
+//  SEARCH
+// =============================================================
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q) { searchIdx = -1; resetNodeColors(true); return; }
+
+  const match = nodes.findIndex(n =>
+    n.displayName.toLowerCase().includes(q) ||
+    n.id.toLowerCase().includes(q)
+  );
+  searchIdx = match;
+  resetNodeColors(true);
+
+  if (match >= 0) {
+    // Highlight yellow
+    const cols  = colorAttr.array;
+    const gcols = glowColorAttr.array;
+    cols[match*3]   = SEARCH_COLOR.r;
+    cols[match*3+1] = SEARCH_COLOR.g;
+    cols[match*3+2] = SEARCH_COLOR.b;
+    gcols[match*3]  = SEARCH_COLOR.r * 0.8;
+    gcols[match*3+1]= SEARCH_COLOR.g * 0.8;
+    gcols[match*3+2]= SEARCH_COLOR.b * 0.8;
+    colorAttr.needsUpdate     = true;
+    glowColorAttr.needsUpdate = true;
+    focusNode(match);
+  }
+});
+
+// =============================================================
+//  RESET
+// =============================================================
+document.getElementById('btnReset').addEventListener('click', () => {
+  closePanel();
+  nodes = []; edges = []; folders = [];
+  if (nodePoints) scene.remove(nodePoints);
+  if (glowPoints) scene.remove(glowPoints);
+  if (edgeLines)  scene.remove(edgeLines);
+  if (highlightEdges) scene.remove(highlightEdges);
+  document.getElementById('ui').classList.remove('on');
+  dropZone.classList.remove('fading', 'gone');
+  dropZone.style.display = '';
+  folderIn.value = '';
+  searchInput.value = '';
+  document.getElementById('hint').style.opacity = '1';
+});
+
+// =============================================================
+//  ANIMATION LOOP
+// =============================================================
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+
+  if (nodePoints) {
+    const t = performance.now() * 0.001;
+    nodePoints.material.uniforms.time.value  = t;
+    glowPoints.material.uniforms.time.value  = t;
+    updateHover();
+  }
+
+  renderer.render(scene, camera);
+}
+
+// =============================================================
+//  UTIL
+// =============================================================
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// =============================================================
+//  AUTO-LOAD from vault-data.js if present
+// =============================================================
+async function autoLoad(data) {
+  // Hide drop zone immediately
+  const dz = document.getElementById('dropZone');
+  dz.classList.add('fading');
+  setTimeout(() => dz.classList.add('gone'), 100);
+
+  const lb = document.getElementById('loadingBar');
+  lb.classList.add('on');
+  setLoad(10, `${data.nodes.length} notes found`);
+  await delay(30);
+
+  // Nodes already parsed — attach required fields
+  for (let i = 0; i < data.nodes.length; i++) {
+    const n = data.nodes[i];
+    n.idx       = i;
+    n.neighbors = [];
+    n.x = 0; n.y = 0; n.z = 0;
+  }
+
+  setLoad(30, 'Resolving connections');
+  await delay(20);
+
+  // Build idxMap for neighbor wiring
+  const idxMap = {};
+  for (const n of data.nodes) idxMap[n.id.toLowerCase()] = n.idx;
+
+  for (const e of data.edges) {
+    const si = idxMap[e.source];
+    const ti = idxMap[e.target];
+    if (si != null && ti != null) {
+      data.nodes[si].neighbors.push(ti);
+      data.nodes[ti].neighbors.push(si);
+    }
+  }
+
+  setLoad(50, 'Running force simulation');
+  await delay(20);
+
+  await runLayout(data);
+
+  setLoad(85, 'Rendering');
+  await delay(20);
+
+  nodes   = data.nodes;
+  edges   = data.edges;
+  folders = [...new Set(nodes.map(n => n.folder))];
+
+  initThree();
+  buildScene();
+
+  lb.classList.remove('on');
+  document.getElementById('ui').classList.add('on');
+  document.getElementById('sNodes').textContent   = nodes.length.toLocaleString();
+  document.getElementById('sEdges').textContent   = edges.length.toLocaleString();
+  document.getElementById('sFolders').textContent = folders.length.toLocaleString();
+}
+
+// Kick off auto-load if data was injected
+if (window.VAULT_DATA) {
+  autoLoad(window.VAULT_DATA);
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Drift — New Tab</title>
+  <link rel="stylesheet" href="newtab.css" />
+</head>
+<body>
+  <canvas id="gl"></canvas>
+
+  <main class="stage">
+    <div class="greeting" id="greeting"></div>
+    <div class="clock" id="clock">--:--</div>
+    <div class="date" id="date"></div>
+
+    <form class="search" id="search" autocomplete="off">
+      <input id="q" type="text" placeholder="search the web…" spellcheck="false" aria-label="Search the web or enter a website address" />
+    </form>
+  </main>
+
+  <div class="moods" id="moods" title="switch mood (or press 1–4)"></div>
+  <div class="moodname" id="moodname"></div>
+
+  <script src="newtab.js"></script>
+</body>
+</html>

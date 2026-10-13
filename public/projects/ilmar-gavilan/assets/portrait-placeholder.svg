@@ -1,0 +1,8 @@
+<svg width="900" height="1100" viewBox="0 0 900 1100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="1100" fill="#0D0D0D"/>
+  <circle cx="450" cy="360" r="160" fill="#1A1A1A" stroke="#D9C8A1" stroke-width="2"/>
+  <path d="M250 920C274 760 354 680 450 680C546 680 626 760 650 920" fill="#161616" stroke="#D9C8A1" stroke-width="2"/>
+  <rect x="90" y="86" width="720" height="928" rx="36" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <text x="450" y="1010" fill="#F4F1EA" font-family="Georgia, serif" font-size="64" text-anchor="middle">Portrait Placeholder</text>
+  <text x="450" y="1060" fill="#BEB8AA" font-family="Arial, sans-serif" font-size="28" text-anchor="middle">Replace with your photo in assets/portrait-placeholder.svg or a JPG file</text>
+</svg>
