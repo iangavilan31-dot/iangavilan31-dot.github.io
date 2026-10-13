@@ -238,7 +238,7 @@
       "Idea": "Make mathematics feel like a connected place to explore, with practice available beside the ideas.",
       "Work": "A flyable chalkboard graph containing 335 topics, 69 mathematicians, 574 prerequisite links and 670 starter problems, plus a 28-skill SAT practice space.",
       "Try": "Follow a prerequisite path, open a topic or mathematician, use the timeline, or practice a SAT skill.",
-      "Development": "A retained scene and bounded drawing caches replace repeated chalk rasterization. Animated glows and paths remain live; the mobile practice map scrolls at a readable scale.",
+      "Development": "A retained scene and bounded drawing caches replace repeated chalk rasterization. Distant camera flights prepare tiles incrementally; glows and paths remain live. SAT practice keeps a chosen goal, dated reviews, retries and local-day progress. Explanations and teaching scenes are still being expanded.",
       "Takeaway": "Fast JavaScript alone does not guarantee smooth drawing. Reducing repeated GPU submissions fixed the pan-and-zoom bottleneck."
     },
     "mascot": "",
@@ -565,7 +565,7 @@
     "id": "cloudline-chaos",
     "title": "Cloudline Chaos",
     "category": "Games",
-    "summary": "A co-op wingsuit prototype about chaotic extractions and rescuing one another in midair.",
+    "summary": "A wingsuit extraction prototype with a bot crew and midair rescue mechanics.",
     "status": "Native prototype",
     "url": "",
     "downloadUrl": "",
@@ -573,10 +573,10 @@
     "image": "./assets/project-cloudline-chaos.png",
     "tags": [
       "Godot",
-      "Co-op"
+      "Prototype"
     ],
     "featured": false,
-    "detail": "A co-op wingsuit prototype about chaotic extractions and rescuing one another in midair. A native development project. The current work is a playable prototype or a focused slice, with further refinement in progress.",
+    "detail": "A wingsuit extraction prototype with a bot crew and midair rescue mechanics. A native development project. The current work is a playable prototype or a focused slice, with further refinement in progress.",
     "mascot": "",
     "mascotSheet": "",
     "video": "",
