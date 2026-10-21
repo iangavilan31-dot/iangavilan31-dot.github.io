@@ -1,4 +1,5 @@
 import { createProjectOrbit } from './project-orbit.js';
+import { makingOverview, reelChapters } from './project-stories.js';
 import { setupOpening, setupMusic, violaCharacter, comparison, chalkIcon, setupNotebook, revealContent } from './experience.js';
 const $ = (selector, scope = document) => scope.querySelector(selector);
 const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
@@ -81,7 +82,7 @@ function projectCharacter(project) {
 function projectImage(project, eager = false) {
   if (!project.image) return fallbackArt(project);
   const image = element('img');
-  image.src = project.image;
+  image.src = project.videoPoster || project.image;
   image.alt = `${project.title} project preview`;
   image.loading = eager ? 'eager' : 'lazy';
   image.decoding = 'async';
@@ -90,7 +91,7 @@ function projectImage(project, eager = false) {
 }
 
 function featuredMedia(project, eager, select = openProject) {
-  const media = element('div', 'feature-media');
+  const media = element('div', `feature-media${project.category === 'Games' ? ' game-media' : ''}`);
   const visual = element('button', 'feature-visual');
   visual.type = 'button';
   visual.setAttribute('aria-label', `View ${project.title} project details`);
@@ -106,7 +107,7 @@ function featuredMedia(project, eager, select = openProject) {
     video.muted = true; video.loop = true; video.playsInline = true; video.preload = 'none';
     video.setAttribute('aria-hidden', 'true');
     video.tabIndex = -1;
-    if (project.image) video.poster = project.image;
+    if (project.videoPoster || project.image) video.poster = project.videoPoster || project.image;
     const button = element('button', 'preview-control', 'Play preview ▷');
     button.type = 'button';
     button.setAttribute('aria-label', `Play preview of ${project.title}`);
@@ -137,8 +138,8 @@ function dialogMedia(project) {
   video.muted = true;
   video.playsInline = true;
   video.preload = 'metadata';
-  if (project.image) video.poster = project.image;
-  video.setAttribute('aria-label', `${project.title} gameplay preview`);
+  if (project.videoPoster || project.image) video.poster = project.videoPoster || project.image;
+  video.setAttribute('aria-label', `${project.title} gameplay reel`);
   video.addEventListener('error', () => video.replaceWith(projectImage(project, true)), { once: true });
   return video;
 }
@@ -257,7 +258,9 @@ function detailParagraphs(detail) {
 function openProject(project, trigger) {
   if (!document.documentElement.classList.contains('loaded')) window.finishPortfolioLoader?.();
   document.dispatchEvent(new Event('portfolio-project-open'));
-  state.lastTrigger = trigger || document.activeElement;
+  const returnTarget = trigger || document.activeElement;
+  state.restoreScroll = !returnTarget?.matches('button, a, input, [tabindex]');
+  state.lastTrigger = state.restoreScroll ? $('.orbit-card[data-position="center"] .feature-visual') || $('#project-search') : returnTarget;
   preview.classList.remove('show');
   $('#dialog-eyebrow').textContent = `MY WORK / ${project.category}`;
   $('#dialog-title').textContent = project.title;
@@ -266,18 +269,33 @@ function openProject(project, trigger) {
   $('#dialog-summary').textContent = project.summary;
   $$('#dialog-image video').forEach(video => video.pause());
   $('#dialog-image').replaceChildren(dialogMedia(project));
+  const reelNotes = $('#dialog-reel');
+  reelNotes.replaceChildren();
+  reelNotes.hidden = !project.video;
+  if (project.video) {
+    const duration = project.reel?.duration ? `${Math.round(project.reel.duration)} seconds` : 'gameplay';
+    reelNotes.append(element('p', 'reel-note', `a few moments in play · ${duration} · silent reel`));
+    const chapters = reelChapters(project, $('#dialog-image video'));
+    if (chapters) reelNotes.append(chapters);
+  }
   const status = projectStatus(project);
   $('#dialog-status').className = `status ${status.className}`;
   $('#dialog-status').textContent = status.label;
-  const paragraphs = detailParagraphs(project.detail).filter(text => text.trim() !== project.summary.trim());
+  const paragraphs = project.story ? [] : detailParagraphs(project.detail).filter(text => text.trim() !== project.summary.trim());
   $('#dialog-detail').replaceChildren(...paragraphs.map(text => element('p', '', text)));
+  const making = makingOverview(project);
+  if (making) $('#dialog-detail').append(making);
   const process = comparison(project);
-  if (process) $('#dialog-detail').append(process);
-  $('#dialog-detail').hidden = !paragraphs.length && !process;
+  if (process) {
+    const iteration = element('details', 'iteration-peek');
+    iteration.append(element('summary', '', 'see an earlier version ↔'), process);
+    $('#dialog-detail').append(iteration);
+  }
+  $('#dialog-detail').hidden = !paragraphs.length && !process && !making;
   $('#dialog-tags').replaceChildren(...project.tags.map(tag => element('li', '', tag)));
   const links = [];
   const isDownload = project.url && /\.(zip|exe|dmg)(?:[?#]|$)/i.test(project.url);
-  if (project.url) links.push(externalLink(project.url, isDownload ? 'Download the prototype ↓' : project.category === 'Games' ? 'Play the game ↗' : 'Open project ↗'));
+  if (project.url) links.push(externalLink(project.url, isDownload ? 'Download the prototype ↓' : project.status === 'Private prototype' ? 'Open private prototype ↗' : project.category === 'Games' ? 'Play the game ↗' : 'Open project ↗'));
   if (project.downloadUrl) links.push(externalLink(project.downloadUrl, 'Download extension files ↓'));
   if (project.sourceUrl) links.push(externalLink(project.sourceUrl, 'View source ↗'));
   if (!links.length) links.push(element('p', '', 'This project is part of the collection; a public release is not available yet.'));
@@ -312,7 +330,7 @@ dialog.addEventListener('close', () => {
   previewPlayers.forEach(syncPreview);
   document.body.classList.remove('modal-open');
   if (location.hash.startsWith('#project=')) history.replaceState(null, '', `${location.pathname}${location.search}#work`);
-  state.lastTrigger?.focus({ preventScroll: true });
+  state.lastTrigger?.focus({ preventScroll: !state.restoreScroll });
 });
 window.addEventListener('hashchange', () => {
   if (location.hash.startsWith('#project=')) {
@@ -374,18 +392,22 @@ setupMusic();
 
 async function start() {
   try {
-    const response = await fetch('./data/projects.json');
+    const [response, stories] = await Promise.all([
+      fetch('./data/projects.json'),
+      fetch('./data/game-stories.json').then(result => result.ok ? result.json() : {}).catch(() => ({})),
+    ]);
     if (!response.ok) throw new Error(`Project collection returned ${response.status}`);
     const data = await response.json();
     const items = Array.isArray(data) ? data : data.projects;
     if (!Array.isArray(items)) throw new Error('Project collection must be an array.');
     state.projects = items.filter(item => item && item.id && item.title).map(item => ({
       ...item,
+      story: stories[item.id] || null,
       title: String(item.title),
       summary: String(item.summary || ''),
       category: categories.includes(item.category) && item.category !== 'All' ? item.category : 'Creative',
       tags: Array.isArray(item.tags) ? item.tags.map(String) : [],
-      url: safeUrl(item.url), downloadUrl: safeUrl(item.downloadUrl), sourceUrl: safeUrl(item.sourceUrl), image: safeUrl(item.image), mascot: safeUrl(item.mascot), mascotSheet: safeUrl(item.mascotSheet), video: safeUrl(item.video),
+      url: safeUrl(item.url), downloadUrl: safeUrl(item.downloadUrl), sourceUrl: safeUrl(item.sourceUrl), image: safeUrl(item.image), videoPoster: safeUrl(item.videoPoster), mascot: safeUrl(item.mascot), mascotSheet: safeUrl(item.mascotSheet), video: safeUrl(item.video),
       comparison: item.comparison ? { ...item.comparison, before: safeUrl(item.comparison.before), after: safeUrl(item.comparison.after) } : null,
     }));
     $$('[data-count]').forEach(node => { node.textContent = String(state.projects.length).padStart(2, '0'); });

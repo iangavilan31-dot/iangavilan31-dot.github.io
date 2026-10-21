@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 5140 --strictPort",
-    "build": "vite build",
+    "build": "node scripts/build-making-pages.mjs && vite build",
     "preview": "vite preview --port 5140 --strictPort",
     "check": "node check.mjs"
   },
