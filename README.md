@@ -41,7 +41,7 @@ Catalog media and demo URLs use page-relative paths such as `./assets/project-na
 - **In development**: unfinished work without a ready public demo.
 - **Research**: a study or experiment, not a deployed application.
 
-The imported collection currently has 65 records: 44 live demos, one archived demo, eight native prototypes, eight local projects, two projects in development and two research projects. Update this snapshot when the catalog changes; the site itself calculates its counts from the catalog.
+The imported collection currently has 66 records: 44 live demos, one archived demo, eight native prototypes, eight local projects, two projects in development, two research projects and one private prototype. Update this snapshot when the catalog changes; the site itself calculates its counts from the catalog.
 
 ## Publish
 
@@ -53,6 +53,13 @@ Before publishing, check the production preview, project search and details, loc
 
 ## Opening and media
 
-The introduction uses actual page elements and runs for about three seconds on the first visit; Skip, Replay, immediate navigation and reduced motion are supported. Its choreography and the explicit-play YouTube listening panel are in `src/experience.js`. The authorized recording is Kenji Bunch, Blue Hour Duo (2022), linked from Ian’s channel. All game clips are actual recordings, with controlled playback and poster fallbacks.
+The notebook opening draws a sprout, then reveals the name and original alien-gardener artwork. It runs for under two seconds once per browser session; Skip, Replay, immediate navigation and reduced motion are supported. Its choreography and the explicit-play YouTube listening panel are in `src/experience.js`. The authorized recording is Kenji Bunch, Blue Hour Duo (2022), linked from Ian’s channel. All game clips are actual recordings, with controlled playback and poster fallbacks.
 
 Optional project fields include `video`, `mascotSheet`, `downloadUrl`, and `comparison` (`before`, `after`, labels and caption). Use authentic historical captures for comparisons. Run `npm run build` then `npm run check` after catalog changes.
+
+## Notebook design and selected pages
+
+- `src/notebook-art.js` contains the original articulated alien, terrarium and chalk icons.
+- `src/project-orbit.js` implements the user-controlled 3D podium: three visible projects, one spotlight, arrow keys, touch swipes, and separate games, tools, and stories tabs. It never rotates automatically.
+- The 15 selections are configured in `renderFeatured()` in `src/main.js`. The full catalog is retained in the searchable collection. Moonbite is an additional entry, explicitly identified as a private prototype; its hosting audience is unchanged.
+- `src/styles.css` uses locally served Patrick Hand (OFL) and Nunito. The system reduced-motion setting and the footer motion control stop animations and automatic video previews without hiding content.
