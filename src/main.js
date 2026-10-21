@@ -156,7 +156,7 @@ function renderFeatured() {
   for (const player of previewPlayers) { player.video.pause(); mediaObserver?.unobserve(player.frame); }
   previewPlayers.clear();
   const selections = [
-    { id: 'games', label: 'games', description: 'Little worlds. Long detours. The games I keep coming back to.', ids: ['moonbite', 'pocket-gods', 'black-pilgrim', 'nullbloom', 'impossible-lab'] },
+    { id: 'games', label: 'games', description: 'Little worlds. Long detours. The games I keep coming back to.', ids: ['moonbite', 'pocket-gods', 'cloudline-chaos', 'slime-rangers', 'impossible-lab'] },
     { id: 'tools', label: 'tools', description: 'Useful little systems, made for a real question or a daily ritual.', ids: ['theory-studio', 'neighbor-ready', 'the-network', 'gradus', 'pane'] },
     { id: 'stories', label: 'stories & experiments', description: 'History, sound, and the things that happen between disciplines.', ids: ['the-red-archive', 'off-the-page', 'afterlives', 'afterimage', 'icarvs'] },
   ];
