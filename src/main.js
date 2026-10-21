@@ -1,5 +1,5 @@
 import { createProjectOrbit } from './project-orbit.js';
-import { setupOpening, setupMusic, violaCharacter, bookCharacter, comparison, chalkIcon, setupNotebook, revealContent } from './experience.js';
+import { setupOpening, setupMusic, violaCharacter, comparison, chalkIcon, setupNotebook, revealContent } from './experience.js';
 const $ = (selector, scope = document) => scope.querySelector(selector);
 const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
 let reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -364,7 +364,6 @@ $('#copy-email').addEventListener('click', async () => {
   setTimeout(() => { button.firstChild.textContent = 'Copy email address '; }, 3500);
 });
 $('#footer-year').textContent = String(new Date().getFullYear());
-$('#about-mascot').append(bookCharacter());
 setupNotebook();
 window.addEventListener('scroll', () => preview.classList.remove('show'), { passive: true });
 document.addEventListener('visibilitychange', () => previewPlayers.forEach(syncPreview));
