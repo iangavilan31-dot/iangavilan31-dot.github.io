@@ -1406,5 +1406,32 @@
     "mascotSheet": "",
     "video": "",
     "comparison": null
+  },
+  {
+    "id": "moonbite",
+    "title": "Moonbite",
+    "category": "Games",
+    "summary": "A small gardener on a spherical moon. Plant, water, explore, and survive what grows after dark.",
+    "status": "Private prototype",
+    "url": "https://moonbite-garden-survival.gamerboyhi13.chatgpt.site",
+    "downloadUrl": "",
+    "sourceUrl": "",
+    "image": "./assets/project-moonbite.png",
+    "tags": [
+      "Three.js",
+      "Spherical world",
+      "Farming survival"
+    ],
+    "featured": true,
+    "detail": {
+      "Idea": "A tiny garden with a whole moon to wander around.",
+      "Work": "A farming survival game on a real 3D spherical moon, with surface-aligned movement, planting, watering and combat. The little world can be explored around its poles and far side.",
+      "Try": "The preview shows the gardener on the moon. The linked hosted prototype requires the owner’s existing access; it is not a public release.",
+      "Development": "An original illustrated world with plants rooted to the sphere, moisture feedback and a growing set of survival interactions."
+    },
+    "mascot": "",
+    "mascotSheet": "",
+    "video": "",
+    "comparison": null
   }
 ]
