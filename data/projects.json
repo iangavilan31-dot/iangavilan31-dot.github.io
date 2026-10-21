@@ -44,13 +44,39 @@
     },
     "mascot": "./assets/mascot-frog.png",
     "mascotSheet": "./assets/mascot-frog-sheet.png",
-    "video": "./assets/videos/impossible-lab-four-worlds.mp4",
+    "video": "./assets/videos/reels/impossible-lab-reel.mp4",
     "comparison": {
       "before": "./assets/lab-before.jpg",
       "after": "./assets/lab-after.jpg",
       "beforeLabel": "Earlier creature",
       "afterLabel": "Current creature",
       "caption": "The same room and camera: a lower silhouette reveals the chambered shell and sensory fans. Larger field labels make the objective easier to read."
+    },
+    "videoPoster": "./assets/reel-posters/impossible-lab-poster.jpg",
+    "reel": {
+      "duration": 16.57,
+      "chapters": [
+        {
+          "time": 0,
+          "title": "Research printworks",
+          "description": "The first-person view moves from the printworks interior to the transfer plates puzzle."
+        },
+        {
+          "time": 4.0,
+          "title": "Pair-sum colony",
+          "description": "Glowing pods and equation displays show a number-based interaction."
+        },
+        {
+          "time": 7.8,
+          "title": "Drop garden",
+          "description": "A softly coloured garden presents three potted plants and a conserved-drop puzzle."
+        },
+        {
+          "time": 11.8,
+          "title": "Mechanical chamber",
+          "description": "Large red and black mechanical figures move around the player and scanner."
+        }
+      ]
     }
   },
   {
@@ -432,8 +458,29 @@
     "detail": "A small planetary adventure with a native campaign and local co-op systems. A native development project. The current work is a playable prototype or a focused slice, with further refinement in progress. Download the Windows prototype; extract the ZIP and run the executable.",
     "mascot": "",
     "mascotSheet": "",
-    "video": "./assets/videos/pocket-gods.mp4",
-    "comparison": null
+    "video": "./assets/videos/reels/pocket-gods-reel.mp4",
+    "comparison": null,
+    "videoPoster": "./assets/reel-posters/pocket-gods-poster.jpg",
+    "reel": {
+      "duration": 10.67,
+      "chapters": [
+        {
+          "time": 0,
+          "title": "A tiny planetary system",
+          "description": "An astronaut boosts past Bloomhaven with Ember Mesa and Prismwild visible beyond."
+        },
+        {
+          "time": 2.9,
+          "title": "Crossing between worlds",
+          "description": "The camera follows the jetpack flight toward Prismwild while the speed indicator changes."
+        },
+        {
+          "time": 7.4,
+          "title": "Steering in flight",
+          "description": "The astronaut turns across the cloud-filled sky; the existing flight HUD stays visible."
+        }
+      ]
+    }
   },
   {
     "id": "croakdown-native",
@@ -453,8 +500,29 @@
     "detail": "An isometric frog co-op roguelite with an evolving arena, enemies, and character motion. A native development project. The current work is a playable prototype or a focused slice, with further refinement in progress.",
     "mascot": "",
     "mascotSheet": "",
-    "video": "./assets/videos/croakdown-native.mp4",
-    "comparison": null
+    "video": "./assets/videos/reels/croakdown-native-reel.mp4",
+    "comparison": null,
+    "videoPoster": "./assets/reel-posters/croakdown-native-poster.jpg",
+    "reel": {
+      "duration": 11.7,
+      "chapters": [
+        {
+          "time": 0,
+          "title": "Two frogs, one arena",
+          "description": "Moss and Morel share a pond arena while a swarm closes in."
+        },
+        {
+          "time": 3.0,
+          "title": "Attack through the swarm",
+          "description": "Sword sweeps and tongue-ready indicators remain visible as the enemies close in."
+        },
+        {
+          "time": 7.0,
+          "title": "Stay close to revive",
+          "description": "One player goes down; the other approaches as the partner revival meter fills."
+        }
+      ]
+    }
   },
   {
     "id": "croakdown",
@@ -495,8 +563,29 @@
     "detail": "A cartoon expedition with a blaster, vacuum, scanner, co-op extraction, and a ship to return to. A native development project. The current work is a playable prototype or a focused slice, with further refinement in progress.",
     "mascot": "",
     "mascotSheet": "",
-    "video": "./assets/videos/slime-rangers.mp4",
-    "comparison": null
+    "video": "./assets/videos/reels/slime-rangers-reel.mp4",
+    "comparison": null,
+    "videoPoster": "./assets/reel-posters/slime-rangers-poster.jpg",
+    "reel": {
+      "duration": 9.87,
+      "chapters": [
+        {
+          "time": 0,
+          "title": "Hold the line",
+          "description": "Slimes approach through the desert outpost as the first-person blaster engages."
+        },
+        {
+          "time": 1.6,
+          "title": "Protect the coolant rig",
+          "description": "The view turns toward the circular coolant apparatus and the nearby ship."
+        },
+        {
+          "time": 8.7,
+          "title": "Choose a field tech",
+          "description": "The footage shows the three upgrade cards, selects Decoy Bloom, and returns to the outpost."
+        }
+      ]
+    }
   },
   {
     "id": "rift-warden",
@@ -516,8 +605,29 @@
     "detail": "A pixel arena roguelite with shifting waves, weapon choices, and a fight to survive.",
     "mascot": "",
     "mascotSheet": "",
-    "video": "./assets/videos/rift-warden.mp4",
-    "comparison": null
+    "video": "./assets/videos/reels/rift-warden-reel.mp4",
+    "comparison": null,
+    "videoPoster": "./assets/reel-posters/rift-warden-poster.jpg",
+    "reel": {
+      "duration": 8.37,
+      "chapters": [
+        {
+          "time": 0,
+          "title": "Arena under pressure",
+          "description": "The character moves through a dark circular arena with enemies and projectiles approaching."
+        },
+        {
+          "time": 2.8,
+          "title": "Build a streak",
+          "description": "Attacks connect while the kill-streak counter rises across the top of the screen."
+        },
+        {
+          "time": 6.0,
+          "title": "Keep moving",
+          "description": "The player shifts along the arena edge while the enemy wave continues."
+        }
+      ]
+    }
   },
   {
     "id": "somnium",
@@ -1431,7 +1541,28 @@
     },
     "mascot": "",
     "mascotSheet": "",
-    "video": "",
-    "comparison": null
+    "video": "./assets/videos/reels/moonbite.mp4",
+    "comparison": null,
+    "videoPoster": "./assets/reel-posters/moonbite.jpg",
+    "reel": {
+      "duration": 12.27,
+      "chapters": [
+        {
+          "time": 0,
+          "title": "Around the moon",
+          "description": "The gardener walks along the curved surface as the moon turns beneath them."
+        },
+        {
+          "time": 4.15,
+          "title": "Plant & water",
+          "description": "A seed is planted and the gardener pours water onto the new bed; the moisture meter drops as the soil receives it."
+        },
+        {
+          "time": 8.2,
+          "title": "The far side",
+          "description": "The gardener walks beyond the bed, passing rocks and grasses across the spherical garden."
+        }
+      ]
+    }
   }
 ]

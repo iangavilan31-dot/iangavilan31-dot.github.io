@@ -1,0 +1,457 @@
+{
+  "moonbite": {
+    "question": "Could a whole little moon feel like a garden you want to come back to?",
+    "approach": "Moonbite pairs a real Three.js spherical world with illustrated characters and crops. The simulation is separated from rendering, input and audio, so planting, watering, manual combat and saved gardens can share the same rules.",
+    "practice": "The project develops spherical movement, state persistence and readable action animation. It also brings together sprite integration, procedural scenery and original Web Audio sound.",
+    "skills": [
+      "Three.js",
+      "Spherical movement",
+      "Game state & saves",
+      "Sprite animation",
+      "Procedural audio"
+    ],
+    "steps": [
+      {
+        "title": "Make the surface behave like a world",
+        "body": "Movement follows the moon’s curvature and transports the control frame around it. Characters, soil, plants and attack warnings stay rooted to that same surface, including the poles and far side."
+      },
+      {
+        "title": "Build a small care loop",
+        "body": "A planted bed stores its moisture and growth. Watering chooses a real nearby crop, shows its moisture ring and spends only the water the plant needs; dry soil visibly darkens when it becomes wet."
+      },
+      {
+        "title": "Give actions a clear moment of contact",
+        "body": "Machete cuts have wind-up, one directional hit and recovery. Walking follows actual travel, while planting settles into the soil and watering uses a timed pour, keeping feedback connected to the action."
+      },
+      {
+        "title": "Protect the place between visits",
+        "body": "Home and survival journeys have independent checkpoints. Plants, resources, positions and mining scars survive a return home, and older save formats are migrated instead of silently discarding the garden."
+      }
+    ],
+    "reflection": "The useful detail is often the smallest one: soil color, a grounded foot or a correctly timed cut tells the player what the rules are doing. Keeping those signals tied to the simulation makes the garden easier to understand.",
+    "scope": "An illustrated farming-survival prototype; the linked hosted build is private and the newer local work remains in development."
+  },
+  "pocket-gods": {
+    "question": "How can a suit make flying between tiny planets feel playful, powerful and easy to read?",
+    "approach": "Pocket Gods is a native Godot flight prototype with three small planets and the Stillwater Rift. Procedural suit, planet and creature geometry supports a solo expedition, plasma and beam tools, upgrades and host/join co-op.",
+    "practice": "The work develops 3D movement, procedural modeling and the relationship between combat controls and camera readability. Packaging the game also exercises native export, input settings and network-session design.",
+    "skills": [
+      "Godot",
+      "3D flight controls",
+      "Procedural modeling",
+      "Co-op systems",
+      "Native export"
+    ],
+    "steps": [
+      {
+        "title": "Define a readable flight vocabulary",
+        "body": "Movement separates rising, descending, boosting and braking. Mouse aim controls the direction of play, while flight bindings can be changed in the suit settings."
+      },
+      {
+        "title": "Build worlds around the suit",
+        "body": "The three planets and Stillwater Rift provide places to travel, fight and interact. Planet surfaces, plants, creatures and suit geometry are created for the project rather than assembled from a downloaded character pack."
+      },
+      {
+        "title": "Connect weapons and progression",
+        "body": "Plasma fire and a sustained beam give the suit two different combat actions. The upgrade screen and interaction control keep the expedition’s progression close to the movement loop."
+      },
+      {
+        "title": "Package a playable expedition",
+        "body": "The Windows export runs without a Godot installation. Two-player host/join uses a reachable UDP host; LAN and Internet sessions have different network requirements."
+      }
+    ],
+    "reflection": "Flight needs more than speed: a dependable brake, clear vertical controls and distinct weapon behavior give movement a shape. A portfolio sequence should show that control loop before the scenery.",
+    "scope": "Playable Windows prototype; visual development, physical-controller testing and public-Internet co-op testing remain in progress."
+  },
+  "cloudline-chaos": {
+    "question": "Can a risky wingsuit descent become a shared rescue story?",
+    "approach": "Cloudline Chaos is a Godot wingsuit-extraction prototype with a bot crew and midair rescue mechanics. Its focus is the relationship between flight, danger and getting the crew out.",
+    "practice": "The prototype explores 3D movement, spatial readability and the design of cooperative rescue situations. Those are the most useful skills to foreground while the project is still a focused development slice.",
+    "skills": [
+      "Godot",
+      "Flight prototyping",
+      "3D spatial design",
+      "Co-op interaction design"
+    ],
+    "steps": [
+      {
+        "title": "Start with the flight situation",
+        "body": "The wingsuit gives traversal a clear identity: forward motion, altitude and a landing opportunity are part of the same problem."
+      },
+      {
+        "title": "Put the crew inside that problem",
+        "body": "A bot crew and midair rescue mechanics connect movement to another character’s situation, making extraction more than reaching a destination alone."
+      },
+      {
+        "title": "Give the descent a destination",
+        "body": "Extraction ties the flight and rescue ideas together. The plane in the current prototype image establishes a point of departure, while the wingsuit and rescue premise give that departure a purpose."
+      }
+    ],
+    "reflection": "The strongest design question is whether a player can read a rescue opportunity while still controlling their own flight. Keeping the crew’s situation visible is central to the idea.",
+    "scope": "PC-made wingsuit extraction prototype. The current portfolio shows a gameplay still; a public playable build is not linked."
+  },
+  "slime-rangers": {
+    "question": "What if an alien expedition felt like a cartoon toy box, with every tool giving a different way to explore?",
+    "approach": "Slime Rangers is a native Godot exploration prototype built around a blaster, vacuum and scanner. Co-op extraction and a return ship connect the expedition’s tools to a clear way home.",
+    "practice": "The work explores tool design, 3D world readability and how several interactions can fit one expedition loop. The cartoon presentation also makes consistent silhouettes and visual feedback part of the design problem.",
+    "skills": [
+      "Godot",
+      "Exploration systems",
+      "Tool interaction design",
+      "Co-op prototyping",
+      "Visual readability"
+    ],
+    "steps": [
+      {
+        "title": "Give the expedition different verbs",
+        "body": "The blaster, vacuum and scanner create a broader interaction vocabulary than a single weapon. Each tool is part of how the player reads and acts on the alien world."
+      },
+      {
+        "title": "Stage the encounter around something to protect",
+        "body": "The recorded outpost encounter brings incoming slimes toward a coolant rig. The first-person blaster, hit feedback and objective HUD keep the threat and the task in the same view."
+      },
+      {
+        "title": "Let the outing change the next action",
+        "body": "The field-tech menu offers three upgrades, including Decoy Bloom. The recorded sequence returns from that choice to the outpost, connecting progression to the active encounter. Co-op extraction and the ship form the wider expedition premise."
+      }
+    ],
+    "reflection": "A tool is easier to understand when the objective gives it a purpose. In this slice, the coolant rig anchors the encounter and the field-tech choice gives a reason to reconsider the next action.",
+    "scope": "Native exploration prototype; a public release is not currently linked."
+  },
+  "impossible-lab": {
+    "question": "Could four worlds with different rules become one connected experiment?",
+    "approach": "Impossible Lab combines a first-person Three.js world with a React interface, a field journal and local saves. Four rooms introduce different creatures and instruments, then ask the player to carry discoveries into physical hybrid experiments.",
+    "practice": "The project develops procedural 3D modeling, articulated animation and the design of systems that explain themselves through play. It also connects interface writing, camera and collision work with persistent puzzle progression.",
+    "skills": [
+      "Three.js",
+      "React",
+      "Procedural creature modeling",
+      "Articulated animation",
+      "Puzzle systems",
+      "Save compatibility"
+    ],
+    "steps": [
+      {
+        "title": "Give each room one rule to learn",
+        "body": "The rooms turn channels, tune a swimming colony, divide a conserved water supply and test a moving relay. Each instrument makes its state visible instead of relying on a long instruction screen."
+      },
+      {
+        "title": "Build creatures that communicate",
+        "body": "Creatures use original procedural geometry and articulated rigs. Their poses, hazards and actions share a clock, so anticipation and response belong to the same readable sequence."
+      },
+      {
+        "title": "Connect discoveries across rooms",
+        "body": "The field campaign adds transfer plates, linked colonies, water gardens and a six-seal relay. Three physical hybrid proofs turn the collected discoveries into things the player can test in the world."
+      },
+      {
+        "title": "Keep a complete journey",
+        "body": "The journal records observations, local saves preserve progress and the reactor provides an ending. Earlier saves keep their prior ending while new games use the expanded field campaign."
+      }
+    ],
+    "reflection": "Changing the creature’s silhouette and the size of field labels improved both character and instruction. The before-and-after comparison shows why art and legibility need to be judged together.",
+    "scope": "Playable browser experiment with four worlds, a field campaign and an ending."
+  },
+  "sable-seas": {
+    "question": "How much of a pirate adventure can come from a crew operating one shared ship?",
+    "approach": "Sable Seas is a first-person Three.js pirate sandbox with nine islands, wind-dependent sailing, cannon combat and browser co-op. Rendering, simulation, data, audio and networking are separate modules, with a host simulating shared world state.",
+    "practice": "The project develops procedural water, multiplayer state design and the integration of animated 3D assets. It also exercises research, asset adaptation and turning a collection of mechanics into a complete voyage.",
+    "skills": [
+      "Three.js",
+      "Ocean shaders",
+      "Browser networking",
+      "3D asset integration",
+      "Simulation design"
+    ],
+    "steps": [
+      {
+        "title": "Make the ship a set of shared jobs",
+        "body": "The wheel, capstan, sails and cannons are usable stations with occupancy rules. Wind, rudder position and gradual acceleration connect those jobs to actual sailing."
+      },
+      {
+        "title": "Connect the sea to a voyage",
+        "body": "Treasure charts lead to island digs; chests can be carried, stowed and sold back at the harbor. Damage creates hull holes, rising water and repairs, giving the return journey its own decisions."
+      },
+      {
+        "title": "Keep one world for the crew",
+        "body": "Room codes and host-simulated shared state coordinate stations, actions and voyage votes. Guest interpolation smooths remote movement, while host-loss handling explains when the session has ended."
+      }
+    ],
+    "reflection": "Shared stations make cooperation concrete. The useful constraint is that a voyage must still make sense from lowering the sail to selling the recovered cargo.",
+    "scope": "Playable early browser build with invited-crew co-op; sustained separate-network testing and broader production work remain."
+  },
+  "ink-out": {
+    "question": "Could taking color back from a city become a short interactive heist?",
+    "approach": "INK/OUT builds a procedural Three.js rooftop district around a living-ink character and a sequence of color-taking missions. Camera choreography, moving geometry and a print-style shader turn each action into a brief visual scene.",
+    "practice": "The work develops procedural scene construction, shader design and interactive camera direction. It also explores how movement, sound and color changes can communicate progress without a dense interface.",
+    "skills": [
+      "Three.js",
+      "Procedural environments",
+      "GLSL shaders",
+      "Camera choreography",
+      "Interactive storytelling"
+    ],
+    "steps": [
+      {
+        "title": "Construct the district",
+        "body": "Buildings, roof machinery, bridges, signs and an elevated train create the city from geometry. Static geometry is merged by material while recolorable facades remain independent."
+      },
+      {
+        "title": "Animate the ink and the mission",
+        "body": "A deforming nucleus and tapered brushstroke ribbons give the ink its own motion. Mission actions move the character and camera together, apply a visible city change and return control to the orbit view."
+      },
+      {
+        "title": "Make the whole frame feel printed",
+        "body": "A post-processing pass adds restrained grain, edge darkening and halftone shadows. Color collection builds toward a final repainting of the district."
+      }
+    ],
+    "reflection": "The clearest version gives one visual change to each action. Keeping the camera’s approach, contact and return in one sequence makes the heist readable as an interaction.",
+    "scope": "Playable browser study in procedural city design and interactive visual storytelling."
+  },
+  "mirefall": {
+    "question": "How can a huge boss’s scale become a mechanic instead of only a camera effect?",
+    "approach": "Mirefall is a third-person Three.js action encounter in a flooded swamp. Procedural meshes, textures, sound and music support a three-phase moth-deity fight with readable warnings, a poise break and phase checkpoints.",
+    "practice": "The project develops boss-state design, procedural rendering and combat camera work. Performance tiers and shape-and-sound telegraphs add practical experience with scalability and accessibility.",
+    "skills": [
+      "Three.js",
+      "Boss encounter design",
+      "Procedural rendering",
+      "Combat cameras",
+      "Performance profiling"
+    ],
+    "steps": [
+      {
+        "title": "Turn size into a vulnerability rule",
+        "body": "The deity’s head is out of reach during normal play. Attacking its legs breaks poise and brings the head down for a stronger damage window."
+      },
+      {
+        "title": "Build anticipation into every attack",
+        "body": "Ground shapes, eye cues and distinct sounds signal attacks before impact. Recovery windows give the player an understandable chance to respond and punish."
+      },
+      {
+        "title": "Escalate the same arena",
+        "body": "Later phases add diving attacks, enemies and an arena-wide strike that uses raised pillars as cover. Phase checkpoints preserve progress, while quality presets adjust expensive rendering features."
+      }
+    ],
+    "reflection": "The boss becomes easier to understand when its scale controls where and when it can be hurt. Shape and sound carry the warning alongside color.",
+    "scope": "Playable desktop-browser action prototype with a complete three-phase encounter."
+  },
+  "nox": {
+    "question": "How much impact can come from a small arena and a few carefully timed actions?",
+    "approach": "NOX is a single-file Canvas arena game built around dashing, melee strikes and energy-powered bolts. Procedural drawing, particles, camera feedback and Web Audio synthesis give those actions a shared visual and sound identity.",
+    "practice": "The project develops action timing, input handling and lightweight 2D rendering. It is a focused exercise in making a compact move set feel distinct through anticipation, impact and recovery.",
+    "skills": [
+      "Canvas 2D",
+      "JavaScript",
+      "Combat timing",
+      "Procedural effects",
+      "Web Audio"
+    ],
+    "steps": [
+      {
+        "title": "Separate the actions in time",
+        "body": "Dash speed and duration, melee wind-up and active frames, bolt cost and cooldowns are explicit configuration values. Their differences create the arena’s basic rhythm."
+      },
+      {
+        "title": "Make a hit feel like an event",
+        "body": "Impact sound, glowing particles, rings and camera trauma respond to the action. The camera follows with easing and a slight lead toward the player’s aim."
+      },
+      {
+        "title": "Keep the loop compact",
+        "body": "Movement, enemy spawning, energy rewards and the play/pause states live in a small browser build. The restricted scope keeps attention on the moment-to-moment fight."
+      }
+    ],
+    "reflection": "A short pause, a clear flash and a distinct sound can make the same amount of damage feel very different. Consistent timing matters more than adding more effects.",
+    "scope": "Playable browser arena study."
+  },
+  "lumen": {
+    "question": "Can the last small light stay readable while the darkness around it grows?",
+    "approach": "Lumen is a Canvas survival game with a luminous player, growing enemy pressure and collectible embers. Experience leads to upgrade choices, while a procedural audio layer and a restrained light palette support the survival loop.",
+    "practice": "The project develops 2D game-loop design, progression choices and visual hierarchy under pressure. It also uses browser storage for a best-run record and explicit menu, pause, level-up and defeat states.",
+    "skills": [
+      "Canvas 2D",
+      "JavaScript",
+      "Survival progression",
+      "Visual hierarchy",
+      "Procedural audio"
+    ],
+    "steps": [
+      {
+        "title": "Build the light-and-swarm contrast",
+        "body": "The player and ember pickups stand apart from the shades. Enemy spawning increases pressure while the drawing system keeps the player’s position visible."
+      },
+      {
+        "title": "Make survival change the next decision",
+        "body": "Embers feed experience and open upgrade choices. The world freezes during level-up so a player can read and choose without losing the run in the background."
+      },
+      {
+        "title": "Complete the restart loop",
+        "body": "Menu, playing, pause, level-up and defeat have explicit states. A best score is stored between visits, giving the short run a persistent target."
+      }
+    ],
+    "reflection": "A survival game can get visually busy quickly. Holding the player, danger and reward in separate value ranges keeps the important decisions visible.",
+    "scope": "Playable browser survival prototype."
+  },
+  "croakdown-native": {
+    "question": "Can two little frog fighters make a shared arena feel weighty and cooperative?",
+    "approach": "CRACKDOWN rebuilds the earlier frog-combat idea as an isometric Godot arena. Five waves combine directional sword sweeps, tongue setups, independent local players, upgrades, revival and a final champion.",
+    "practice": "The work develops local input separation, combat progression and rigged 2D animation. Painterly source views are deformed with a textured mesh, while attached equipment and planted foot motion give the frogs a more physical presence.",
+    "skills": [
+      "Godot",
+      "Local co-op",
+      "2D mesh animation",
+      "Combat systems",
+      "Native export"
+    ],
+    "steps": [
+      {
+        "title": "Keep the arena open for the fight",
+        "body": "Placed ruins, reeds, water, reflections and foreground sorting create depth without filling the middle with obstacles. There is no single static background image."
+      },
+      {
+        "title": "Give each frog its own action",
+        "body": "Independent movement and attack controls support two local players. Directional sword sweeps, tongue setups and a downed-partner revive connect their actions."
+      },
+      {
+        "title": "Rig the artwork and finish the run",
+        "body": "Eight painterly source views drive deforming meshes with planted feet, torso lean and separate equipment. Five waves and upgrade choices lead to a final champion."
+      }
+    ],
+    "reflection": "The rebuild makes animation and shared input part of the core design. A fighter needs to appear planted before its weapon can feel heavy.",
+    "scope": "Playable native arena prototype; authored enemy and attack animation still needs polish."
+  },
+  "croakdown": {
+    "question": "What happens when the player is both a frog fighter and the defender shaping the arena?",
+    "approach": "The earlier Croakdown browser study combines shared-screen frog combat with living swamp towers. TypeScript modules separate simulation, input, rendering and a feel layer driven by combat events.",
+    "practice": "The project develops event-based combat architecture, local co-op and procedural character rendering. It also explores how knockback and partner interactions can create decisions beyond dealing damage.",
+    "skills": [
+      "TypeScript",
+      "Canvas rendering",
+      "Local co-op",
+      "Combat events",
+      "Game feel"
+    ],
+    "steps": [
+      {
+        "title": "Separate rules from their presentation",
+        "body": "The simulation owns damage, knockback, enemy state and spawning. Rendering and the feel layer consume the results, so a landed hit can drive coordinated feedback."
+      },
+      {
+        "title": "Make hits interact with the partner",
+        "body": "Launched enemies can be met by the other frog’s swing for a volley spike. Hitstop, launch thresholds and enemy armor rules give different attacks different consequences."
+      },
+      {
+        "title": "Keep the prototype’s history visible",
+        "body": "The browser study remains a separate stage from the later native arena rebuild. Its role is to show the earlier combat and co-op direction, without presenting it as a current public release."
+      }
+    ],
+    "reflection": "A single authoritative hit event is a useful boundary: the simulation can stay consistent while sound, shake and animation all respond to the same impact.",
+    "scope": "Earlier browser prototype; a public playable build is not currently linked."
+  },
+  "rift-warden": {
+    "question": "Can an arena’s weapons and wave choices make each run develop its own character?",
+    "approach": "Rift Warden is a Phaser and TypeScript arena roguelite with enemy waves, weapons, upgrades and persistent progression. Its browser build combines generated environment and character art, animated sprite states and procedural audio.",
+    "practice": "The project develops scene-based game architecture, upgrade data and sprite integration. Keeping combat readable across waves also exercises enemy-state design and the coordination of art, effects and interface.",
+    "skills": [
+      "Phaser",
+      "TypeScript",
+      "Upgrade systems",
+      "Sprite animation",
+      "Procedural audio"
+    ],
+    "steps": [
+      {
+        "title": "Build a run from scenes and data",
+        "body": "An armory and arena connect weapon identity to the playable run. Weapons such as the Ashblade define roles, tags and combat behavior rather than existing only as artwork."
+      },
+      {
+        "title": "Give enemies and players explicit states",
+        "body": "The shipped art includes idle, walk, attack, hurt and death sprite strips. Keeping those states distinct helps the player read a crowded arena."
+      },
+      {
+        "title": "Carry selected progress between runs",
+        "body": "The save data stores progression such as mastery, discoveries and rift depth. Upgrade choices and enemy waves give each new attempt room to develop differently."
+      }
+    ],
+    "reflection": "Animation and combat rules need to be reviewed together. A polished still image cannot replace an attack that clearly announces when it begins and when it connects.",
+    "scope": "Playable browser arena prototype."
+  },
+  "somnium": {
+    "question": "Can a quiet two-player journey use the same gesture for resting, helping and moving forward?",
+    "approach": "Somnium is a painted Canvas and TypeScript journey through five chapters and an epilogue. Procedurally baked scene layers, articulated knights and a shared camera connect exploration, encounters and campfire transitions.",
+    "practice": "The project develops layered environment painting, procedural character animation and contextual camera design. It also connects co-op input, combat timing and chapter persistence through a small set of shared rituals.",
+    "skills": [
+      "Canvas 2D",
+      "TypeScript",
+      "Procedural animation",
+      "Layered scene composition",
+      "Local co-op"
+    ],
+    "steps": [
+      {
+        "title": "Author the journey as connected scenes",
+        "body": "Each chapter defines its own bounds, color wash, light, entry position and transition. Layers bake on first entry and remain cached instead of repeating that work every frame."
+      },
+      {
+        "title": "Make the knights share the frame",
+        "body": "Drop-in local co-op uses a camera that fits both characters. Movement and combat operate across a shallow depth band, so circling and spacing can matter inside the painted world."
+      },
+      {
+        "title": "Use rest as a transition",
+        "body": "The campfire ritual connects chapter changes, saving and a second player’s arrival. Rest, revival and quieting share a related visual vocabulary."
+      }
+    ],
+    "reflection": "Reusing a gesture can give separate systems a common feeling. The campfire is useful because it does narrative, progression and co-op work in the same place.",
+    "scope": "Earlier browser journey prototype; the portfolio links its source rather than a public build."
+  },
+  "black-pilgrim": {
+    "question": "Can a road, a distant castle and a huge moon make walking feel like a journey?",
+    "approach": "Black Pilgrim is a Godot world-design prototype with procedural terrain, atmosphere and knight movement. Lighting, fog, a following camera and distance-driven joint animation support a lone traveler on ancient roads.",
+    "practice": "The project develops environmental composition, procedural locomotion and the discipline of measuring visual defects. World-pinned stance feet and secondary cape motion make animation a technical problem as well as an aesthetic one.",
+    "skills": [
+      "Godot",
+      "World composition",
+      "Procedural locomotion",
+      "Lighting & atmosphere",
+      "Visual debugging"
+    ],
+    "steps": [
+      {
+        "title": "Compose the route and distant landmarks",
+        "body": "Terrain, road and architecture builders establish the knight’s path through the world. Moonlight, sky and fog control how those shapes separate in a dark scene."
+      },
+      {
+        "title": "Keep feet attached to the ground",
+        "body": "The stride advances from measured distance rather than a free-running timer. A stance foot is latched in world space, while the body moves over it and the cape follows with secondary motion."
+      },
+      {
+        "title": "Make iteration repeatable",
+        "body": "Named captures and visual checks make changes easier to compare. The animation source records a real acceleration-related foot-slide defect and the contact-latch correction used to fix it."
+      }
+    ],
+    "reflection": "A walk that looks correct at constant speed can fail during acceleration or stopping. Measuring the transitions exposed a defect that still-frame review would miss.",
+    "scope": "Native world and animation prototype; a public playable release is not currently linked."
+  },
+  "nullbloom": {
+    "question": "How can a familiar industrial place become unsettling when something in it learns from the player?",
+    "approach": "Nullbloom is a Godot night-shift reclamation prototype set in a drowned industrial city. Its current portfolio slice centers on a hostile double that learns from the player.",
+    "practice": "The prototype explores environmental atmosphere, encounter design and the readability of a pursuing threat. Its current presentation is a focused concept and development slice rather than a complete released campaign.",
+    "skills": [
+      "Godot",
+      "Atmospheric world design",
+      "Encounter prototyping",
+      "Threat readability"
+    ],
+    "steps": [
+      {
+        "title": "Establish an ordinary task in an uneasy place",
+        "body": "The night-shift reclamation setting gives the player work to do inside the drowned city. That everyday task is the frame for the threat."
+      },
+      {
+        "title": "Give the threat a recognizable relationship",
+        "body": "The hostile double connects the danger to the player’s own behavior. The design question is how clearly that relationship can be communicated during play."
+      }
+    ],
+    "reflection": "The core design question is how a player notices that the double is responding to them. Readable cause and effect matters as much as the atmosphere around the encounter.",
+    "scope": "Native development prototype; source and a public playable build are not currently linked."
+  }
+}
