@@ -121,12 +121,13 @@
   "impossible-lab": {
     "question": "Could four worlds with different rules become one connected experiment?",
     "approach": "Impossible Lab combines a first-person Three.js world with a React interface, a field journal and local saves. Four rooms introduce different creatures and instruments, then ask the player to carry discoveries into physical hybrid experiments.",
-    "practice": "The project develops procedural 3D modeling, articulated animation and the design of systems that explain themselves through play. It also connects interface writing, camera and collision work with persistent puzzle progression.",
+    "practice": "The project develops procedural 3D modeling, articulated animation and the design of systems that explain themselves through play. A later art pass explores geometry, material roughness and lighting, while keeping the journal, collisions and saved puzzle progression connected.",
     "skills": [
       "Three.js",
       "React",
       "Procedural creature modeling",
       "Articulated animation",
+      "Materials & lighting",
       "Puzzle systems",
       "Save compatibility"
     ],
@@ -140,6 +141,10 @@
         "body": "Creatures use original procedural geometry and articulated rigs. Their poses, hazards and actions share a clock, so anticipation and response belong to the same readable sequence."
       },
       {
+        "title": "Let materials explain the form",
+        "body": "A presentation layer rounds structural edges, adds fine mounting details and gives metals brushed roughness. Glass keeps a clear highlight, clay keeps its soft texture, and a warm key with a cooler rim separates each specimen from the room. Static details are merged by material to limit extra draw calls."
+      },
+      {
         "title": "Connect discoveries across rooms",
         "body": "The field campaign adds transfer plates, linked colonies, water gardens and a six-seal relay. Three physical hybrid proofs turn the collected discoveries into things the player can test in the world."
       },
@@ -148,7 +153,7 @@
         "body": "The journal records observations, local saves preserve progress and the reactor provides an ending. Earlier saves keep their prior ending while new games use the expanded field campaign."
       }
     ],
-    "reflection": "Changing the creature’s silhouette and the size of field labels improved both character and instruction. The before-and-after comparison shows why art and legibility need to be judged together.",
+    "reflection": "The same shape can feel very different under a broad fill or a directional light. Comparing the atrium from the same viewpoint made it easier to judge edge softness, metal response and separation without changing the game’s rules.",
     "scope": "Playable browser experiment with four worlds, a field campaign and an ending."
   },
   "sable-seas": {
